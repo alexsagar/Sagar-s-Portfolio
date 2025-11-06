@@ -67,6 +67,9 @@
 }
 
 @layer base {
+  html {
+    scroll-padding-top: 7rem;
+  }
   * {
     @apply border-border !scroll-smooth;
   }

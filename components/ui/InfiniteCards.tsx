@@ -22,6 +22,18 @@ export const InfiniteMovingCards = ({
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const scrollerRef = React.useRef<HTMLUListElement>(null);
+  const avatars = [
+    "🦊",
+    "🐼",
+    "🐸",
+    "🐯",
+    "🐵",
+    "🐨",
+    "🐶",
+    "🐱",
+    "🦄",
+    "🐧",
+  ];
 
   useEffect(() => {
     addAnimation();
@@ -114,9 +126,10 @@ export const InfiniteMovingCards = ({
                 {item.quote}
               </span>
               <div className="relative z-20 mt-6 flex flex-row items-center">
-                {/* add this div for the profile img */}
-                <div className="me-3">
-                  <img src="/profile.svg" alt="profile" />
+                <div className="me-3 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center animate-pulse select-none">
+                  <span className="text-xl" aria-hidden>
+                    {avatars[idx % avatars.length]}
+                  </span>
                 </div>
                 <span className="flex flex-col gap-1">
                   {/* change text color, font-normal to font-bold, text-xl */}

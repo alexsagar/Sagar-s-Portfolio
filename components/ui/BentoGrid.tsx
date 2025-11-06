@@ -1,8 +1,10 @@
-import { useState } from "react";
-import { IoCopyOutline } from "react-icons/io5";
+ 'use client';
+ import { useEffect, useState } from "react";
+ import { IoCopyOutline } from "react-icons/io5";
+ import dynamic from "next/dynamic";
 
-// Also install this npm i --save-dev @types/react-lottie
-import Lottie from "react-lottie";
+ // Also install this npm i --save-dev @types/react-lottie
+ const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 import { cn } from "@/lib/utils";
 
@@ -53,9 +55,14 @@ export const BentoGridItem = ({
   spareImg?: string;
 }) => {
   const leftLists = ["ReactJS", "Express", "Typescript"];
-  const rightLists = ["VueJS", "NuxtJS", "GraphQL"];
+  const rightLists = ["TailwindCSS", "NextJS", "GraphQL"];
 
   const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const defaultOptions = {
     loop: copied,
@@ -67,8 +74,10 @@ export const BentoGridItem = ({
   };
 
   const handleCopy = () => {
-    const text = "hsu@jsmastery.pro";
-    navigator.clipboard.writeText(text);
+    const text = "alexsagar07@gmail.com";
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    }
     setCopied(true);
   };
 
@@ -176,11 +185,17 @@ export const BentoGridItem = ({
               {/* remove focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 */}
               {/* add handleCopy() for the copy the text */}
               <div
-                className={`absolute -bottom-5 right-0 ${copied ? "block" : "block"
-                  }`}
+                className={`absolute -bottom-5 right-0 ${copied ? "block" : "block"}`}
               >
                 {/* <img src="/confetti.gif" alt="confetti" /> */}
-                <Lottie options={defaultOptions} height={200} width={400} />
+                {mounted && (
+                  <Lottie
+                    animationData={defaultOptions.animationData}
+                    loop={defaultOptions.loop}
+                    autoplay={defaultOptions.autoplay}
+                    style={{ height: 200, width: 400 }}
+                  />
+                )}
               </div>
 
               <MagicButton

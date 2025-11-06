@@ -1,0 +1,24 @@
+name: npm-audit
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+        working-directory: ./
+      - name: Run npm audit
+        run: |
+          set -e
+          npm audit --audit-level=high || true
+          npm audit --json > audit-report.json || true
+          # Fail build on critical vulnerabilities
+          if grep -q '"severity":"critical"' audit-report.json; then
+            echo "Critical vulnerabilities found" && exit 1
+          fi

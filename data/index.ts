@@ -49,7 +49,7 @@ export const gridItems = [
 
   {
     id: 5,
-    title: "Currently building a JS Animation library",
+    title: "Currently building a Finance Management System",
     description: "The Inside Scoop",
     className: "md:col-span-3 md:row-span-2",
     imgClassName: "absolute right-0 bottom-0 md:w-96 w-60",
@@ -72,68 +72,64 @@ export const gridItems = [
 export const projects = [
   {
     id: 1,
-    title: "3D Solar System Planets to Explore",
-    des: "Explore the wonders of our solar system with this captivating 3D simulation of the planets using Three.js.",
-    img: "/p1.svg",
-    iconLists: ["/re.svg", "/tail.svg", "/ts.svg", "/three.svg", "/fm.svg"],
-    link: "/ui.earth.com",
+    title: "CinemaGhar",
+    des: "Movie discovery and details app with a clean, responsive UI.",
+    img: "https://res.cloudinary.com/dtuqbqgz7/image/upload/v1756630452/Screenshot_2025-08-31_143843_ybjyax.png",
+    iconLists: ["/re.svg", "/tail.svg", "/ts.svg"],
+    link: "https://github.com/alexsagar/CinemaGhar",
   },
   {
     id: 2,
-    title: "Yoom - Video Conferencing App",
-    des: "Simplify your video conferencing experience with Yoom. Seamlessly connect with colleagues and friends.",
-    img: "/p2.svg",
-    iconLists: ["/next.svg", "/tail.svg", "/ts.svg", "/stream.svg", "/c.svg"],
-    link: "/ui.yoom.com",
+    title: "GamePasal",
+    des: "Gaming storefront demo with product listings and modern UI.",
+    img: "https://res.cloudinary.com/dtuqbqgz7/image/upload/v1756627868/gamepasal_gfshjs.png",
+    iconLists: ["/re.svg", "/tail.svg", "/ts.svg"],
+    link: "https://github.com/alexsagar/GamePasal",
   },
   {
     id: 3,
-    title: "AI Image SaaS - Canva Application",
-    des: "A REAL Software-as-a-Service app with AI features and a payments and credits system using the latest tech stack.",
-    img: "/p3.svg",
-    iconLists: ["/re.svg", "/tail.svg", "/ts.svg", "/three.svg", "/c.svg"],
-    link: "/ui.aiimg.com",
+    title: "Tea-N-Tea Management System",
+    des: "Management dashboard for operations and record keeping.",
+    img: "https://res.cloudinary.com/dtuqbqgz7/image/upload/v1756627867/teantea_d4tobk.png",
+    iconLists: ["/re.svg", "/tail.svg", "/ts.svg"],
+    link: "https://github.com/alexsagar/Tea-N-Tea-Management-System",
   },
   {
     id: 4,
-    title: "Animated Apple Iphone 3D Website",
-    des: "Recreated the Apple iPhone 15 Pro website, combining GSAP animations and Three.js 3D effects..",
-    img: "/p4.svg",
-    iconLists: ["/next.svg", "/tail.svg", "/ts.svg", "/three.svg", "/gsap.svg"],
-    link: "/ui.apple.com",
+    title: "Full Stack Voting App",
+    des: "End-to-end voting application with secure flows.",
+    img: "https://res.cloudinary.com/dtuqbqgz7/image/upload/v1756630691/Screenshot_2025-08-31_144301_i9fngb.png",
+    iconLists: ["/re.svg", "/tail.svg", "/ts.svg"],
+    link: "https://github.com/alexsagar/fullstack-voting-app",
+  },
+  {
+    id: 5,
+    title: "Nike Ecommerce Website",
+    des: "Ecommerce UI inspired by Nike—product cards and smooth layout.",
+    img: "https://res.cloudinary.com/dtuqbqgz7/image/upload/v1756630778/Screenshot_2025-08-31_144412_mqolqt.png",
+    iconLists: ["/re.svg", "/tail.svg", "/ts.svg"],
+    link: "https://github.com/alexsagar/Nike-Ecommerce-Website",
   },
 ];
 
 export const testimonials = [
   {
     quote:
-      "Collaborating with Adrian was an absolute pleasure. His professionalism, promptness, and dedication to delivering exceptional results were evident throughout our project. Adrian's enthusiasm for every facet of development truly stands out. If you're seeking to elevate your website and elevate your brand, Adrian is the ideal partner.",
-    name: "Michael Johnson",
-    title: "Director of AlphaStream Technologies",
+      "Working with Sagar was a great experience from start to finish. He quickly understood our requirements and translated them into clean, scalable features with thoughtful UX. Communication was consistent and proactive, and he handled feedback with a professional, solutions‑oriented mindset. The final deliverables were stable, performant, and easy for our team to maintain.",
+    name: "Saugat Ojha",
+    title: "HypeAD Marketing Agency",
   },
   {
     quote:
-      "Collaborating with Adrian was an absolute pleasure. His professionalism, promptness, and dedication to delivering exceptional results were evident throughout our project. Adrian's enthusiasm for every facet of development truly stands out. If you're seeking to elevate your website and elevate your brand, Adrian is the ideal partner.",
-    name: "Michael Johnson",
-    title: "Director of AlphaStream Technologies",
+      "Sagar demonstrated strong problem‑solving skills and genuine ownership over his work. He iterated quickly, improved UI/UX details without being asked, and backed decisions with clear reasoning. His collaborative approach and attention to edge cases significantly improved our timelines and overall quality of the product experience.",
+    name: "Mindrisers Institute",
+    title: "Training & Collaboration Partner",
   },
   {
     quote:
-      "Collaborating with Adrian was an absolute pleasure. His professionalism, promptness, and dedication to delivering exceptional results were evident throughout our project. Adrian's enthusiasm for every facet of development truly stands out. If you're seeking to elevate your website and elevate your brand, Adrian is the ideal partner.",
-    name: "Michael Johnson",
-    title: "Director of AlphaStream Technologies",
-  },
-  {
-    quote:
-      "Collaborating with Adrian was an absolute pleasure. His professionalism, promptness, and dedication to delivering exceptional results were evident throughout our project. Adrian's enthusiasm for every facet of development truly stands out. If you're seeking to elevate your website and elevate your brand, Adrian is the ideal partner.",
-    name: "Michael Johnson",
-    title: "Director of AlphaStream Technologies",
-  },
-  {
-    quote:
-      "Collaborating with Adrian was an absolute pleasure. His professionalism, promptness, and dedication to delivering exceptional results were evident throughout our project. Adrian's enthusiasm for every facet of development truly stands out. If you're seeking to elevate your website and elevate your brand, Adrian is the ideal partner.",
-    name: "Michael Johnson",
-    title: "Director of AlphaStream Technologies",
+      "Professional, reliable, and creative—Sagar elevated our digital presence beyond expectations. He produced high‑quality visuals and copy, aligned them with brand goals, and ensured smooth hand‑off and implementation. We appreciated his calm under pressure, clear documentation, and commitment to delivering measurable results.",
+    name: "Bipasana Karki",
+    title: "Duo Nepal",
   },
 ];
 
@@ -173,29 +169,33 @@ export const companies = [
 export const workExperience = [
   {
     id: 1,
-    title: "Frontend Engineer Intern",
-    desc: "Assisted in the development of a web-based platform using React.js, enhancing interactivity.",
+    title: "Website Developer (MERN) — HypeAD Marketing",
+    desc:
+      "Developing responsive interfaces, implementing REST APIs, optimizing performance, and collaborating with cross‑functional teams.",
     className: "md:col-span-2",
     thumbnail: "/exp1.svg",
   },
   {
     id: 2,
-    title: "Mobile App Dev - JSM Tech",
-    desc: "Designed and developed mobile app for both iOS & Android platforms using React Native.",
+    title: "Digital Marketing Manager — HypeAD Marketing",
+    desc:
+      "Led campaigns across Meta, Google & TikTok; created visuals/copy; reported metrics and managed ad spend.",
     className: "md:col-span-2", // change to md:col-span-2
     thumbnail: "/exp2.svg",
   },
   {
     id: 3,
-    title: "Freelance App Dev Project",
-    desc: "Led the dev of a mobile app for a client, from initial concept to deployment on app stores.",
+    title: "Assistant IT Manager — Babylon National School",
+    desc:
+      "Provided IT support, maintained systems/networks, assisted staff, and managed records & SIS.",
     className: "md:col-span-2", // change to md:col-span-2
     thumbnail: "/exp3.svg",
   },
   {
     id: 4,
-    title: "Lead Frontend Developer",
-    desc: "Developed and maintained user-facing features using modern frontend technologies.",
+    title: "Social Media Marketing Manager — streamstop",
+    desc:
+      "Managed online presence, updated website and socials, monitored campaigns, prepared presentations.",
     className: "md:col-span-2",
     thumbnail: "/exp4.svg",
   },
@@ -205,13 +205,16 @@ export const socialMedia = [
   {
     id: 1,
     img: "/git.svg",
+    link: "https://github.com/alexsagar",
   },
   {
     id: 2,
-    img: "/twit.svg",
+    img: "/insta.svg",
+    link: "https://www.instagram.com/unsagarized/",
   },
   {
     id: 3,
     img: "/link.svg",
+    link: "https://www.linkedin.com/in/sagar-nepali-293751217/",
   },
 ];
