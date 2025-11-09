@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Color, Scene, Fog, PerspectiveCamera, Vector3 } from "three";
+import { Color, Scene, Fog, PerspectiveCamera, Vector3, WebGLRenderer } from "three";
 import ThreeGlobe from "three-globe";
 import { useThree, Object3DNode, Canvas, extend } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import countries from "@/data/globe.json";
+
 declare module "@react-three/fiber" {
   interface ThreeElements {
     threeGlobe: Object3DNode<ThreeGlobe, typeof ThreeGlobe>;
@@ -24,7 +25,7 @@ type Position = {
   endLat: number;
   endLng: number;
   arcAlt: number;
-  color: string;
+  color: string | ((t: number) => string);
 };
 
 export type GlobeConfig = {
@@ -59,6 +60,65 @@ interface WorldProps {
 }
 
 let numbersOfRings = [0];
+
+// ---- Defensive sanitation helpers (dev logs once) ----
+const isFiniteNum = (n: unknown) => typeof n === "number" && Number.isFinite(n);
+const coerceNum = (raw: unknown, fallback: number) => {
+  const n = typeof raw === "string" ? Number(raw) : (raw as number);
+  return Number.isFinite(n) ? n : fallback;
+};
+let loggedNaNSanitize = false;
+let loggedColorSanitize = false;
+
+function ensureColorString(c: Position["color"], fallback = "#ffffff"): string {
+  try {
+    if (typeof c === "string") return c;
+    if (typeof c === "function") {
+      const v = c(0);
+      if (typeof v === "string") return v;
+    }
+  } catch {
+    // ignore
+  }
+  if (process.env.NODE_ENV !== "production" && !loggedColorSanitize) {
+    // eslint-disable-next-line no-console
+    console.warn("[Globe] Invalid color source; using fallback once");
+    loggedColorSanitize = true;
+  }
+  return fallback;
+}
+
+function sanitizePositions<T extends Position>(arr: T[]): T[] {
+  const sanitized = arr
+    .filter((d) => {
+      const ok =
+        isFiniteNum(coerceNum(d.startLat, NaN)) &&
+        isFiniteNum(coerceNum(d.startLng, NaN)) &&
+        isFiniteNum(coerceNum(d.endLat, NaN)) &&
+        isFiniteNum(coerceNum(d.endLng, NaN)) &&
+        isFiniteNum(coerceNum(d.arcAlt, 0));
+      return ok;
+    })
+    .map((d) => ({
+      ...d,
+      startLat: coerceNum(d.startLat, 0),
+      startLng: coerceNum(d.startLng, 0),
+      endLat: coerceNum(d.endLat, 0),
+      endLng: coerceNum(d.endLng, 0),
+      arcAlt: Math.max(0, coerceNum(d.arcAlt, 0.1)),
+      order: Math.max(0, Math.floor(coerceNum(d.order, 0))),
+      color: ensureColorString(d.color),
+    })) as T[];
+
+  if (process.env.NODE_ENV !== "production" && !loggedNaNSanitize) {
+    if (sanitized.length !== arr.length) {
+      // eslint-disable-next-line no-console
+      console.warn(`[Globe] Sanitized ${arr.length - sanitized.length} invalid arc entries`);
+    }
+    loggedNaNSanitize = true;
+  }
+  return sanitized;
+}
 
 export function Globe({ globeConfig, data }: WorldProps) {
   const [globeData, setGlobeData] = useState<
@@ -107,29 +167,38 @@ export function Globe({ globeConfig, data }: WorldProps) {
       emissiveIntensity: number;
       shininess: number;
     };
-    globeMaterial.color = new Color(globeConfig.globeColor);
-    globeMaterial.emissive = new Color(globeConfig.emissive);
-    globeMaterial.emissiveIntensity = globeConfig.emissiveIntensity || 0.1;
-    globeMaterial.shininess = globeConfig.shininess || 0.9;
+    globeMaterial.color = new Color(defaultProps.globeColor);
+    globeMaterial.emissive = new Color(defaultProps.emissive);
+    globeMaterial.emissiveIntensity = defaultProps.emissiveIntensity || 0.1;
+    globeMaterial.shininess = defaultProps.shininess || 0.9;
   };
 
   const _buildData = () => {
-    const arcs = data;
-    let points = [];
+    const arcs = sanitizePositions(data);
+    let points: {
+      size: number;
+      order: number;
+      color: (t: number) => string;
+      lat: number;
+      lng: number;
+    }[] = [];
+
     for (let i = 0; i < arcs.length; i++) {
       const arc = arcs[i];
-      const rgb = hexToRgb(arc.color) as { r: number; g: number; b: number };
+      const rgb = hexToRgb(arc.color as string) as { r: number; g: number; b: number };
+      const colorFn = (t: number) => `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${1 - t})`;
+
       points.push({
         size: defaultProps.pointSize,
         order: arc.order,
-        color: (t: number) => `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${1 - t})`,
+        color: colorFn,
         lat: arc.startLat,
         lng: arc.startLng,
       });
       points.push({
         size: defaultProps.pointSize,
         order: arc.order,
-        color: (t: number) => `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${1 - t})`,
+        color: colorFn,
         lat: arc.endLat,
         lng: arc.endLng,
       });
@@ -138,11 +207,7 @@ export function Globe({ globeConfig, data }: WorldProps) {
     // remove duplicates for same lat and lng
     const filteredPoints = points.filter(
       (v, i, a) =>
-        a.findIndex((v2) =>
-          ["lat", "lng"].every(
-            (k) => v2[k as "lat" | "lng"] === v[k as "lat" | "lng"]
-          )
-        ) === i
+        a.findIndex((v2) => ["lat", "lng"].every((k) => (v2 as any)[k] === (v as any)[k])) === i
     );
 
     setGlobeData(filteredPoints);
@@ -150,78 +215,77 @@ export function Globe({ globeConfig, data }: WorldProps) {
 
   useEffect(() => {
     if (globeRef.current && globeData) {
-      globeRef.current
-        .hexPolygonsData(countries.features)
-        .hexPolygonResolution(3)
-        .hexPolygonMargin(0.7)
-        .showAtmosphere(defaultProps.showAtmosphere)
-        .atmosphereColor(defaultProps.atmosphereColor)
-        .atmosphereAltitude(defaultProps.atmosphereAltitude)
-        .hexPolygonColor((e) => {
-          return defaultProps.polygonColor;
-        });
-      startAnimation();
+      try {
+        globeRef.current
+          .hexPolygonsData(countries.features)
+          .hexPolygonResolution(3)
+          .hexPolygonMargin(0.7)
+          .showAtmosphere(defaultProps.showAtmosphere)
+          .atmosphereColor(defaultProps.atmosphereColor)
+          .atmosphereAltitude(defaultProps.atmosphereAltitude)
+          .hexPolygonColor(() => defaultProps.polygonColor);
+        startAnimation();
+      } catch (e) {
+        if (process.env.NODE_ENV !== "production") {
+          // eslint-disable-next-line no-console
+          console.warn("[Globe] hex polygon setup skipped due to error", e);
+        }
+      }
     }
   }, [globeData]);
 
   const startAnimation = () => {
     if (!globeRef.current || !globeData) return;
 
-    globeRef.current
-      .arcsData(data)
-      .arcStartLat((d) => (d as { startLat: number }).startLat * 1)
-      .arcStartLng((d) => (d as { startLng: number }).startLng * 1)
-      .arcEndLat((d) => (d as { endLat: number }).endLat * 1)
-      .arcEndLng((d) => (d as { endLng: number }).endLng * 1)
-      .arcColor((e: any) => (e as { color: string }).color)
-      .arcAltitude((e) => {
-        return (e as { arcAlt: number }).arcAlt * 1;
-      })
-      .arcStroke((e) => {
-        return [0.32, 0.28, 0.3][Math.round(Math.random() * 2)];
-      })
-      .arcDashLength(defaultProps.arcLength)
-      .arcDashInitialGap((e) => (e as { order: number }).order * 1)
-      .arcDashGap(15)
-      .arcDashAnimateTime((e) => defaultProps.arcTime);
+    const sanitizedArcs = sanitizePositions(data);
 
-    globeRef.current
-      .pointsData(data)
-      .pointColor((e) => (e as { color: string }).color)
-      .pointsMerge(true)
-      .pointAltitude(0.0)
-      .pointRadius(2);
+    try {
+      globeRef.current
+        .arcsData(sanitizedArcs)
+        .arcStartLat((d) => (d as Position).startLat)
+        .arcStartLng((d) => (d as Position).startLng)
+        .arcEndLat((d) => (d as Position).endLat)
+        .arcEndLng((d) => (d as Position).endLng)
+        .arcColor((e: any) => ensureColorString((e as Position).color))
+        .arcAltitude((e) => {
+          const alt = (e as Position).arcAlt;
+          return Number.isFinite(alt) ? Math.max(0, alt) : 0.1;
+        })
+        .arcStroke(() => [0.32, 0.28, 0.3][Math.round(Math.random() * 2)])
+        .arcDashLength(defaultProps.arcLength)
+        .arcDashInitialGap((e) => (e as Position).order)
+        .arcDashGap(15)
+        .arcDashAnimateTime(() => defaultProps.arcTime);
 
-    globeRef.current
-      .ringsData([])
-      .ringColor((e: any) => (t: any) => e.color(t))
-      .ringMaxRadius(defaultProps.maxRings)
-      .ringPropagationSpeed(RING_PROPAGATION_SPEED)
-      .ringRepeatPeriod(
-        (defaultProps.arcTime * defaultProps.arcLength) / defaultProps.rings
-      );
+      globeRef.current
+        .pointsData(globeData)
+        .pointColor((e) => {
+          const c = (e as any).color;
+          return ensureColorString(typeof c === 'function' ? c(0) : c);
+        })
+        .pointsMerge(true)
+        .pointAltitude(0.0)
+        .pointRadius(2);
+    } catch (e) {
+      if (process.env.NODE_ENV !== "production") {
+        // eslint-disable-next-line no-console
+        console.warn("[Globe] arc/point setup skipped due to error", e);
+      }
+    }
+
+    try {
+      globeRef.current
+        .ringsData([])
+        .ringColor((e: any) => (t: any) => ensureColorString(e.color(t)))
+        .ringMaxRadius(defaultProps.maxRings)
+        .ringPropagationSpeed(RING_PROPAGATION_SPEED)
+        .ringRepeatPeriod(
+          (defaultProps.arcTime * defaultProps.arcLength) / Math.max(1, defaultProps.rings)
+        );
+    } catch {
+      // ignore
+    }
   };
-
-  useEffect(() => {
-    if (!globeRef.current || !globeData) return;
-
-    const interval = setInterval(() => {
-      if (!globeRef.current || !globeData) return;
-      numbersOfRings = genRandomNumbers(
-        0,
-        data.length,
-        Math.floor((data.length * 4) / 5)
-      );
-
-      globeRef.current.ringsData(
-        globeData.filter((d, i) => numbersOfRings.includes(i))
-      );
-    }, 2000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [globeRef.current, globeData]);
 
   return (
     <>
@@ -231,13 +295,86 @@ export function Globe({ globeConfig, data }: WorldProps) {
 }
 
 export function WebGLRendererConfig() {
-  const { gl, size } = useThree();
+  const { gl, size, scene, invalidate } = useThree();
+  const [contextLost, setContextLost] = useState(false);
 
+  // Separate effect for renderer settings that should update on size changes
   useEffect(() => {
+    if (!gl) return;
+    
     gl.setPixelRatio(window.devicePixelRatio);
     gl.setSize(size.width, size.height);
     gl.setClearColor(0xffaaff, 0);
-  }, []);
+  }, [gl, size]);
+
+  // Separate effect for context loss handling - only set up once
+  useEffect(() => {
+    if (!gl) return;
+
+    const renderer = gl as unknown as WebGLRenderer;
+    const canvas = renderer.domElement;
+
+    // Guard against null canvas
+    if (!canvas) return;
+
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      setContextLost(true);
+    };
+
+    const onRestored = () => {
+      setContextLost(false);
+
+      try {
+        // Reinitialize renderer settings
+        renderer.setPixelRatio(window.devicePixelRatio);
+        const currentSize = new Vector3();
+        renderer.getSize(currentSize as any);
+        renderer.setSize(currentSize.x, currentSize.y);
+        renderer.setClearColor(0xffaaff, 0);
+
+        // Traverse scene and mark all materials/geometries for recompilation
+        scene.traverse((object: any) => {
+          if (object.isMesh) {
+            if (object.material) {
+              object.material.needsUpdate = true;
+            }
+            if (object.geometry) {
+              const attrs = object.geometry.attributes;
+              if (attrs.position) attrs.position.needsUpdate = true;
+              if (attrs.normal) attrs.normal.needsUpdate = true;
+              if (attrs.uv) attrs.uv.needsUpdate = true;
+            }
+          }
+        });
+
+        // Force a render to restore the scene
+        invalidate();
+      } catch (error) {
+        // Silently handle errors during restoration
+      }
+    };
+
+    canvas.addEventListener("webglcontextlost", onLost, false);
+    canvas.addEventListener("webglcontextrestored", onRestored, false);
+
+    return () => {
+      if (canvas) {
+        canvas.removeEventListener("webglcontextlost", onLost, false);
+        canvas.removeEventListener("webglcontextrestored", onRestored, false);
+      }
+    };
+  }, [gl, scene, invalidate]);
+
+  // Optional: Display a message when context is lost
+  if (contextLost && process.env.NODE_ENV !== "production") {
+    return (
+      <mesh position={[0, 0, 0]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial color="red" transparent opacity={0.1} />
+      </mesh>
+    );
+  }
 
   return null;
 }

@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { useWebGLContextHandler } from "@/lib/useWebGLContextHandler";
 
 export const CanvasRevealEffect = ({
   animationSpeed = 0.4,
@@ -194,6 +195,17 @@ const ShaderMaterial = ({
   const { size } = useThree();
   const ref = useRef<THREE.Mesh>();
   let lastFrameTime = 0;
+
+  // Add WebGL context loss handling
+  useWebGLContextHandler({
+    onContextLost: () => {
+      // Animation will pause automatically when context is lost
+    },
+    onContextRestored: () => {
+      // Animation will resume automatically when context is restored
+      lastFrameTime = 0; // Reset frame time
+    },
+  });
 
   useFrame(({ clock }) => {
     if (!ref.current) return;
