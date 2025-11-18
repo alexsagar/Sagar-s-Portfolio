@@ -61,11 +61,11 @@ dryRun: !isProd || !hasSentryToken,
 // For all available options, see:
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-// Upload a larger set of source maps for prettier stack traces (increases build time)
-widenClientFileUpload: true,
+// Upload only essential source maps
+widenClientFileUpload: false,
 
-// Transpiles SDK to be compatible with IE11 (increases bundle size)
-transpileClientSDK: true,
+// Avoid transpiling SDK for legacy browsers to keep bundle small
+transpileClientSDK: false,
 
 // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
 // This can increase your server load as well as your hosting bill.

@@ -1,10 +1,7 @@
  'use client';
- import { useEffect, useState } from "react";
- import { IoCopyOutline } from "react-icons/io5";
- import dynamic from "next/dynamic";
-
- // Also install this npm i --save-dev @types/react-lottie
- const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+import { useEffect, useState } from "react";
+import { IoCopyOutline } from "react-icons/io5";
+import dynamic from "next/dynamic";
 
 import { cn } from "@/lib/utils";
 
@@ -59,6 +56,7 @@ export const BentoGridItem = ({
 
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [LottieComp, setLottieComp] = useState<null | ((props: any) => JSX.Element)>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -79,6 +77,12 @@ export const BentoGridItem = ({
       navigator.clipboard.writeText(text);
     }
     setCopied(true);
+    // Load lottie only when needed
+    if (!LottieComp) {
+      import("lottie-react").then((mod) => {
+        setLottieComp(() => (mod.default as any));
+      });
+    }
   };
 
   return (
@@ -183,19 +187,16 @@ export const BentoGridItem = ({
               {/* add rounded-md h-8 md:h-8, remove rounded-full */}
               {/* remove focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 */}
               {/* add handleCopy() for the copy the text */}
-              <div
-                className={`absolute -bottom-5 right-0 ${copied ? "block" : "block"}`}
-              >
-                {/* <img src="/confetti.gif" alt="confetti" /> */}
-                {mounted && (
-                  <Lottie
+              {copied && LottieComp && (
+                <div className="absolute -bottom-5 right-0">
+                  <LottieComp
                     animationData={defaultOptions.animationData}
                     loop={defaultOptions.loop}
                     autoplay={defaultOptions.autoplay}
                     style={{ height: 200, width: 400 }}
                   />
-                )}
-              </div>
+                </div>
+              )}
 
               <MagicButton
                 title={copied ? "Email is Copied!" : "Copy my email address"}

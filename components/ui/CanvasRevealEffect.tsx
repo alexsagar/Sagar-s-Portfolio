@@ -185,7 +185,7 @@ type Uniforms = {
 const ShaderMaterial = ({
   source,
   uniforms,
-  maxFps = 60,
+  maxFps = 30,
 }: {
   source: string;
   hovered?: boolean;
@@ -261,8 +261,8 @@ const ShaderMaterial = ({
 
     preparedUniforms["u_time"] = { value: 0, type: "1f" };
     preparedUniforms["u_resolution"] = {
-      value: new THREE.Vector2(size.width * 2, size.height * 2),
-    }; // Initialize u_resolution
+      value: new THREE.Vector2(size.width, size.height),
+    }; // Initialize u_resolution with 1x scale for performance
     return preparedUniforms;
   };
 
@@ -301,7 +301,7 @@ const ShaderMaterial = ({
   );
 };
 
-const Shader: React.FC<ShaderProps> = ({ source, uniforms, maxFps = 60 }) => {
+const Shader: React.FC<ShaderProps> = ({ source, uniforms, maxFps = 30 }) => {
   return (
     <Canvas className="absolute inset-0  h-full w-full">
       <ShaderMaterial source={source} uniforms={uniforms} maxFps={maxFps} />

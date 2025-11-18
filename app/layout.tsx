@@ -49,9 +49,7 @@ export default function RootLayout({
         <link rel="icon" href="/profilepic.svg" sizes="any" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#0b1024" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://res.cloudinary.com" />
+        {/** Preconnects removed to avoid unused-preconnect warnings; Next/font handles fonts. */}
         {process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? (
           <meta
             name="google-site-verification"

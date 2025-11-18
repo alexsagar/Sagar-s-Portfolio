@@ -11,4 +11,9 @@ Sentry.init({
   enabled: isProd,
   tracesSampleRate: isProd ? 1 : 0,
   debug: false,
+  // Prevent undici/http auto-instrumentation which can throw on non-string headers in some environments
+  integrations: (integrations) =>
+    integrations.filter((integration: any) =>
+      integration && typeof integration.name === "string" && integration.name !== "Undici" && integration.name !== "Http"
+    ),
 });
