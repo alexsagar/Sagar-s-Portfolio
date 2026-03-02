@@ -206,15 +206,18 @@ export const socialMedia = [
     id: 1,
     img: "/git.svg",
     link: "https://github.com/alexsagar",
+    name: "GitHub",
   },
   {
     id: 2,
     img: "/insta.svg",
     link: "https://www.instagram.com/unsagarized/",
+    name: "Instagram",
   },
   {
     id: 3,
     img: "/link.svg",
     link: "https://www.linkedin.com/in/sagar-nepali-293751217/",
+    name: "LinkedIn",
   },
 ];

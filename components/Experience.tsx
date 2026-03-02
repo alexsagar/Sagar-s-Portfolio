@@ -6,10 +6,10 @@ import { Button } from "./ui/MovingBorders";
 
 const Experience = () => {
   return (
-    <div className="py-20 w-full">
-      <h1 className="heading">
+    <section className="py-20 w-full">
+      <h2 className="heading">
         My <span className="text-purple">work experience</span>
-      </h1>
+      </h2>
 
       <div className="w-full mt-12 grid lg:grid-cols-4 grid-cols-1 gap-10">
         {workExperience.map((card) => (
@@ -39,9 +39,9 @@ const Experience = () => {
                 className="lg:w-32 md:w-20 w-16 h-auto"
               />
               <div className="lg:ms-5">
-                <h1 className="text-start text-xl md:text-2xl font-bold">
+                <h3 className="text-start text-xl md:text-2xl font-bold">
                   {card.title}
-                </h1>
+                </h3>
                 <p className="text-start text-white-100 mt-3 font-semibold">
                   {card.desc}
                 </p>
@@ -50,7 +50,7 @@ const Experience = () => {
           </Button>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

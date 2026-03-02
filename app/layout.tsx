@@ -10,6 +10,15 @@ export const metadata: Metadata = {
   title: "Sagar Nepali | Digital Marketer & MERN Developer",
   description:
     "Digital Marketer & MERN Stack Developer from Kathmandu, Nepal — building responsive web apps and impactful digital experiences.",
+  keywords: [
+    "Sagar Nepali",
+    "Digital Marketer Kathmandu",
+    "MERN Stack Developer Nepal",
+    "React Developer Nepal",
+    "Web Developer Kathmandu",
+    "SEO Specialist Nepal",
+  ],
+  authors: [{ name: "Sagar Nepali" }],
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://sagar-nepali.com.np"),
   alternates: {
     canonical: "/",
@@ -86,12 +95,36 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "Sagar Nepali Portfolio",
-              url: process.env.NEXT_PUBLIC_SITE_URL || "https://sagar-nepali.com.np",
-            }),
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "Sagar Nepali Portfolio",
+                url: process.env.NEXT_PUBLIC_SITE_URL || "https://sagar-nepali.com.np",
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "ProfilePage",
+                mainEntity: {
+                  "@type": "Person",
+                  name: "Sagar Nepali",
+                  jobTitle: "Digital Marketer & MERN Stack Developer",
+                  url: process.env.NEXT_PUBLIC_SITE_URL || "https://sagar-nepali.com.np",
+                  image: `${process.env.NEXT_PUBLIC_SITE_URL || "https://sagar-nepali.com.np"}/profilepic.svg`,
+                }
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "ItemList",
+                itemListElement: [
+                  { "@type": "ListItem", position: 1, name: "CinemaGhar" },
+                  { "@type": "ListItem", position: 2, name: "GamePasal" },
+                  { "@type": "ListItem", position: 3, name: "Tea-N-Tea Management System" },
+                  { "@type": "ListItem", position: 4, name: "Full Stack Voting App" },
+                  { "@type": "ListItem", position: 5, name: "Nike Ecommerce Website" }
+                ]
+              }
+            ]),
           }}
         />
       </head>
