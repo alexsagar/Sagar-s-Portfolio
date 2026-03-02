@@ -49,6 +49,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               aria-label="social link"
               className="w-10 h-10 cursor-pointer flex justify-center items-center backdrop-filter backdrop-blur-lg saturate-180 bg-opacity-75 bg-black-200 rounded-lg border border-black-300"
+              style={{ WebkitBackdropFilter: "blur(16px)" }}
             >
               <Image src={info.img} alt="icons" width={20} height={20} />
             </a>

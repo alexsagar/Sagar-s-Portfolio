@@ -123,7 +123,7 @@ const DotMatrix: React.FC<DotMatrixProps> = ({
     <Shader
       source={`
         precision mediump float;
-        in vec2 fragCoord;
+        varying vec2 fragCoord;
 
         uniform float u_time;
         uniform float u_opacities[10];
@@ -131,7 +131,6 @@ const DotMatrix: React.FC<DotMatrixProps> = ({
         uniform float u_total_size;
         uniform float u_dot_size;
         uniform vec2 u_resolution;
-        out vec4 fragColor;
         float PHI = 1.61803398874989484820459;
         float random(vec2 xy) {
             return fract(tan(distance(xy * PHI, xy) * 0.5) * xy.x);
@@ -141,16 +140,14 @@ const DotMatrix: React.FC<DotMatrixProps> = ({
         }
         void main() {
             vec2 st = fragCoord.xy;
-            ${
-              center.includes("x")
-                ? "st.x -= abs(floor((mod(u_resolution.x, u_total_size) - u_dot_size) * 0.5));"
-                : ""
-            }
-            ${
-              center.includes("y")
-                ? "st.y -= abs(floor((mod(u_resolution.y, u_total_size) - u_dot_size) * 0.5));"
-                : ""
-            }
+            ${center.includes("x")
+          ? "st.x -= abs(floor((mod(u_resolution.x, u_total_size) - u_dot_size) * 0.5));"
+          : ""
+        }
+            ${center.includes("y")
+          ? "st.y -= abs(floor((mod(u_resolution.y, u_total_size) - u_dot_size) * 0.5));"
+          : ""
+        }
       float opacity = step(0.0, st.x);
       opacity *= step(0.0, st.y);
 
@@ -167,8 +164,8 @@ const DotMatrix: React.FC<DotMatrixProps> = ({
 
       ${shader}
 
-      fragColor = vec4(color, opacity);
-      fragColor.rgb *= fragColor.a;
+      gl_FragColor = vec4(color, opacity);
+      gl_FragColor.rgb *= gl_FragColor.a;
         }`}
       uniforms={uniforms}
       maxFps={60}
@@ -271,9 +268,9 @@ const ShaderMaterial = ({
     const materialObject = new THREE.ShaderMaterial({
       vertexShader: `
       precision mediump float;
-      in vec2 coordinates;
+      attribute vec2 coordinates;
       uniform vec2 u_resolution;
-      out vec2 fragCoord;
+      varying vec2 fragCoord;
       void main(){
         float x = position.x;
         float y = position.y;
@@ -284,7 +281,6 @@ const ShaderMaterial = ({
       `,
       fragmentShader: source,
       uniforms: getUniforms(),
-      glslVersion: THREE.GLSL3,
       blending: THREE.CustomBlending,
       blendSrc: THREE.SrcAlphaFactor,
       blendDst: THREE.OneFactor,
