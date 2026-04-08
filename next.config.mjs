@@ -2,28 +2,24 @@ import { withSentryConfig } from '@sentry/nextjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // Keep this for GitHub Pages
+  output: 'export', 
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    unoptimized: true, // Required for static hosting
+    unoptimized: true, 
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
   },
 };
 
-export default withSentryConfig(nextConfig, {
+const sentryConfig = {
   silent: true,
   org: "javascript-mastery",
   project: "javascript-nextjs",
-  // This is the key part: 
-  // It forces Sentry to skip all logic if there's no auth token.
-  dryRun: !process.env.SENTRY_AUTH_TOKEN, 
-}, {
-  widenClientFileUpload: false,
-  transpileClientSDK: false,
-  hideSourceMaps: true,
+  // Skip sentry during build if no token is present
+  dryRun: true, 
   disableLogger: true,
-  automaticVercelMonitors: false, // Set to false since you're on GitHub Pages, not Vercel
-});
+};
+
+export default withSentryConfig(nextConfig, sentryConfig);
