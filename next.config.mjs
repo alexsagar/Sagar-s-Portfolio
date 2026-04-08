@@ -17,7 +17,13 @@ export default withSentryConfig(nextConfig, {
   silent: true,
   org: "javascript-mastery",
   project: "javascript-nextjs",
-  // CRITICAL: Ensure dryRun is true if the Sentry token is missing
-  dryRun: true, 
+  // This is the key part: 
+  // It forces Sentry to skip all logic if there's no auth token.
+  dryRun: !process.env.SENTRY_AUTH_TOKEN, 
+}, {
+  widenClientFileUpload: false,
+  transpileClientSDK: false,
+  hideSourceMaps: true,
   disableLogger: true,
+  automaticVercelMonitors: false, // Set to false since you're on GitHub Pages, not Vercel
 });
