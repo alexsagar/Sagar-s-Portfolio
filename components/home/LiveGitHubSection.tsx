@@ -1,47 +1,59 @@
-import React from "react";
-import { GitBranch, GitCommit, Terminal, Activity, ArrowUpRight } from "lucide-react";
-import { fetchGitHubOverview } from "@/lib/github/repositories";
+"use client";
+
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { GitHubUserActivity } from "@/lib/github/types";
 
 interface LiveGitHubSectionProps {
   activity?: GitHubUserActivity;
 }
 
-export async function LiveGitHubSection({ activity }: LiveGitHubSectionProps) {
-  const github = activity || (await fetchGitHubOverview());
+export function LiveGitHubSection({ activity }: LiveGitHubSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      gsap.from(sectionRef.current, {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 85%",
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section className="py-16 border-b border-[#1A1D23] bg-[#0A0C0E]">
+    <section ref={sectionRef} className="py-16 border-b border-[#1F2228] bg-[#0A0C0E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-[#101215] border border-[#1F2228] rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="bg-[#101215] border border-[#1F2228] p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 font-mono">
           <div className="space-y-2">
-            <div className="font-mono text-xs text-[#67E8F9] uppercase tracking-widest flex items-center gap-2">
-              <Activity className="w-4 h-4 animate-pulse" />
-              <span>LIVE GITHUB REPOSITORY SYNC</span>
+            <div className="text-xs text-[#67E8F9] uppercase tracking-widest">
+              [02] // CONTINUOUS INTEGRATION & REPOSITORY PIPELINE
             </div>
-            <h3 className="text-xl font-bold text-[#F4F4F0]">
-              Active Developer Pipeline & System Activity
+            <h3 className="text-xl font-bold text-[#F4F4F0] font-sans">
+              Automated GitHub REST Activity & Telemetry
             </h3>
-            <p className="text-xs font-mono text-[#92969D]">
-              Latest commit: <span className="text-[#F4F4F0]">&quot;{github.latestCommitMessage}&quot;</span> on repo <span className="text-[#67E8F9]">{github.latestRepoName}</span>
+            <p className="text-xs text-[#92969D]">
+              LATEST COMMIT: &quot;{activity?.latestCommitMessage || "feat: engineering console updates"}&quot; ON &quot;{activity?.latestRepoName || "Sagar-s-Portfolio"}&quot;
             </p>
           </div>
 
-          <div className="flex items-center gap-6 font-mono text-xs">
-            <div className="border-r border-[#1F2228] pr-6 text-right hidden sm:block">
-              <div className="text-[#92969D]">PUBLIC REPOS</div>
-              <div className="text-2xl font-bold text-[#F4F4F0]">{github.publicReposCount}</div>
-            </div>
-
+          <div className="flex items-center gap-6 text-xs">
             <a
-              href={`https://github.com/${github.username}`}
+              href={`https://github.com/${activity?.username || "alexsagar"}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2.5 rounded-lg bg-[#15171B] hover:bg-[#1A1D23] border border-[#1F2228] hover:border-[#67E8F9]/50 text-[#F4F4F0] flex items-center gap-2 transition-all group"
+              className="px-4 py-2.5 bg-[#15171B] border border-[#1F2228] hover:border-[#67E8F9] text-[#F4F4F0] transition-colors"
             >
-              <GitBranch className="w-4 h-4 text-[#67E8F9]" />
-              <span>VIEW GITHUB PROFILE</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[#92969D] group-hover:text-[#F4F4F0]" />
+              OPEN GITHUB PROFILE &rarr;
             </a>
           </div>
         </div>

@@ -1,102 +1,73 @@
-import React from "react";
-import { Cpu, Layout, Database, Wrench, Layers } from "lucide-react";
+"use client";
 
-const STACK_GROUPS = [
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+const STACK = [
   {
-    category: "Frontend Architecture",
-    icon: Layout,
-    items: [
-      { name: "Next.js 14/15/16", level: "Primary" },
-      { name: "React 18/19", level: "Primary" },
-      { name: "TypeScript", level: "Primary" },
-      { name: "Tailwind CSS", level: "Primary" },
-      { name: "Framer Motion", level: "Advanced" },
-    ],
+    category: "01 / CORE LANGUAGES & FRAMEWORKS",
+    items: ["TypeScript", "JavaScript (ESNext)", "Node.js", "React 18+", "Next.js (App Router)", "HTML5 / CSS3"],
   },
   {
-    category: "Backend & Systems",
-    icon: Cpu,
-    items: [
-      { name: "Node.js & Express", level: "Primary" },
-      { name: "Payload CMS", level: "Advanced" },
-      { name: "REST & GraphQL APIs", level: "Primary" },
-      { name: "Server Actions / ISR", level: "Advanced" },
-    ],
+    category: "02 / BACKEND & DATABASE ARCHITECTURE",
+    items: ["PostgreSQL", "MongoDB", "Payload CMS 3.x", "Express.js", "RESTful APIs", "GraphQL"],
   },
   {
-    category: "Database & Storage",
-    icon: Database,
-    items: [
-      { name: "PostgreSQL", level: "Primary" },
-      { name: "MongoDB", level: "Advanced" },
-      { name: "Prisma / Drizzle", level: "Proficient" },
-      { name: "Redis Caching", level: "Proficient" },
-    ],
-  },
-  {
-    category: "DevOps & Tools",
-    icon: Wrench,
-    items: [
-      { name: "Git & GitHub Actions", level: "Primary" },
-      { name: "Vercel / Docker", level: "Advanced" },
-      { name: "ESLint & TypeScript", level: "Primary" },
-      { name: "Postman & Insomnia", level: "Proficient" },
-    ],
+    category: "03 / INFRASTRUCTURE & PERFORMANCE",
+    items: ["ISR & Caching", "Docker", "Vercel / AWS", "Sentry Monitoring", "Git / GitHub Actions", "Core Web Vitals Optimization"],
   },
 ];
 
 export function TechStackSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      gsap.from(".stack-col", {
+        opacity: 0,
+        y: 30,
+        stagger: 0.2,
+        duration: 0.8,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="stack" className="py-24 border-b border-[#1A1D23]">
+    <section ref={sectionRef} id="stack" className="py-24 border-b border-[#1F2228] bg-[#070809]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        
-        {/* Header */}
-        <div>
-          <div className="font-mono text-xs text-[#67E8F9] uppercase tracking-widest mb-2 flex items-center gap-2">
-            <Layers className="w-4 h-4" />
-            <span>TECHNICAL TOOLKIT</span>
+        <div className="font-mono">
+          <div className="text-xs text-[#67E8F9] uppercase tracking-widest mb-2">
+            [03] // SYSTEM ARCHITECTURE & TECHNICAL CAPABILITIES
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#F4F4F0] tracking-tight">
-            Structured Stack & Architecture
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#F4F4F0] font-sans">
+            Technology Stack & Engineering Competencies
           </h2>
         </div>
 
-        {/* Toolkit Matrix */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {STACK_GROUPS.map((group) => {
-            const Icon = group.icon;
-            return (
-              <div
-                key={group.category}
-                className="bg-[#101215] border border-[#1F2228] rounded-xl p-6 space-y-5 hover:border-[#67E8F9]/30 transition-colors"
-              >
-                <div className="flex items-center gap-3 border-b border-[#1F2228] pb-3">
-                  <div className="w-8 h-8 rounded bg-[#15171B] border border-[#1F2228] flex items-center justify-center text-[#67E8F9]">
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-mono text-xs font-semibold text-[#F4F4F0] uppercase tracking-wider">
-                    {group.category}
-                  </h3>
-                </div>
-
-                <div className="space-y-2">
-                  {group.items.map((item) => (
-                    <div
-                      key={item.name}
-                      className="flex items-center justify-between p-2 rounded bg-[#15171B]/60 border border-[#1F2228] font-mono text-xs"
-                    >
-                      <span className="text-[#F4F4F0]">{item.name}</span>
-                      <span className="text-[10px] text-[#92969D] px-1.5 py-0.5 rounded bg-[#101215] border border-[#1F2228]">
-                        {item.level}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {STACK.map((col, idx) => (
+            <div key={idx} className="stack-col space-y-4 border-l border-[#1F2228] pl-6 font-mono">
+              <div className="text-xs text-[#67E8F9]">{col.category}</div>
+              <ul className="space-y-2 text-sm text-[#92969D]">
+                {col.items.map((item, itemIdx) => (
+                  <li key={itemIdx} className="hover:text-[#F4F4F0] transition-colors flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-[#1F2228] hover:bg-[#67E8F9]" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-
       </div>
     </section>
   );

@@ -1,76 +1,89 @@
-import React from "react";
-import { Briefcase, Calendar, MapPin, CheckCircle2 } from "lucide-react";
+"use client";
+
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const EXPERIENCES = [
   {
+    period: "2023 - PRESENT",
     role: "Full-Stack Software Engineer",
-    company: "Freelance & Independent Consulting",
-    period: "2023 - Present",
+    company: "Freelance & Independent Software Consulting",
     location: "Kathmandu, Nepal",
-    description: "Designing and delivering end-to-end full-stack web applications, Payload CMS platforms, and scalable REST API services for global clients.",
-    highlights: [
-      "Built custom Next.js 14+ client portals with PostgreSQL backends.",
-      "Engineered automated GitHub REST integration & ISR caching mechanisms.",
-      "Optimized Core Web Vitals achieving 95+ performance scores.",
+    summary: "Architecting enterprise Web applications, custom Payload CMS platforms, and automated REST API pipelines for international clients.",
+    deliverables: [
+      "Designed resilient Next.js 14+ client portals connected to PostgreSQL backends.",
+      "Engineered automated GitHub REST synchronization with ISR revalidation.",
+      "Optimized site performance to achieve top-tier Core Web Vitals metrics.",
     ],
   },
   {
+    period: "2022 - 2023",
     role: "MERN Stack Developer & Digital Strategist",
     company: "Digital Product Initiatives",
-    period: "2022 - 2023",
     location: "Kathmandu, Nepal",
-    description: "Developed user-centric React interfaces, Express backend microservices, and SEO-optimized Web applications.",
-    highlights: [
-      "Architected CinemaGhar seat booking and ticket reservation UI.",
-      "Created scalable state management patterns and REST API endpoints.",
+    summary: "Built high-performance React frontends, Node/Express API services, and user interfaces.",
+    deliverables: [
+      "Architected CinemaGhar seat management and ticket booking workflow.",
+      "Engineered scalable state management patterns and REST API endpoints.",
     ],
   },
 ];
 
 export function ExperienceSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      gsap.from(".exp-item", {
+        opacity: 0,
+        y: 40,
+        stagger: 0.2,
+        duration: 0.8,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="experience" className="py-24 border-b border-[#1A1D23] bg-[#0A0C0E]">
+    <section ref={sectionRef} id="experience" className="py-24 border-b border-[#1F2228] bg-[#0A0C0E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div>
-          <div className="font-mono text-xs text-[#67E8F9] uppercase tracking-widest mb-2 flex items-center gap-2">
-            <Briefcase className="w-4 h-4" />
-            <span>CAREER TRACK</span>
+        <div className="font-mono">
+          <div className="text-xs text-[#67E8F9] uppercase tracking-widest mb-2">
+            [04] // CAREER TIMELINE & DELIVERABLES
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#F4F4F0] tracking-tight">
-            Work Experience & Background
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#F4F4F0] font-sans">
+            Professional Experience & Track Record
           </h2>
         </div>
 
-        <div className="space-y-8 max-w-4xl">
-          {EXPERIENCES.map((exp, index) => (
+        <div className="space-y-8 max-w-5xl font-mono">
+          {EXPERIENCES.map((exp, idx) => (
             <div
-              key={index}
-              className="bg-[#101215] border border-[#1F2228] rounded-xl p-8 space-y-6 hover:border-[#67E8F9]/30 transition-colors relative"
+              key={idx}
+              className="exp-item bg-[#101215] border border-[#1F2228] p-8 space-y-6 hover:border-[#67E8F9]/40 transition-colors"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#1F2228] pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#1F2228] pb-4 gap-2">
                 <div>
-                  <h3 className="text-xl font-bold text-[#F4F4F0]">{exp.role}</h3>
-                  <div className="text-sm font-mono text-[#67E8F9]">{exp.company}</div>
-                </div>
-
-                <div className="flex flex-col sm:items-end font-mono text-xs text-[#92969D] space-y-1">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{exp.period}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span>{exp.location}</span>
-                  </div>
+                  <div className="text-xs text-[#67E8F9]">{exp.period}</div>
+                  <h3 className="text-xl font-bold text-[#F4F4F0] font-sans mt-1">{exp.role}</h3>
+                  <div className="text-xs text-[#92969D]">{exp.company} &bull; {exp.location}</div>
                 </div>
               </div>
 
-              <p className="text-sm text-[#92969D] leading-relaxed">{exp.description}</p>
+              <p className="text-xs text-[#92969D] leading-relaxed font-sans">{exp.summary}</p>
 
-              <div className="space-y-2 pt-2">
-                {exp.highlights.map((item, hIdx) => (
-                  <div key={hIdx} className="flex items-start gap-2.5 text-xs font-mono text-[#F4F4F0]">
-                    <CheckCircle2 className="w-4 h-4 text-[#67E8F9] shrink-0 mt-0.5" />
+              <div className="space-y-2 pt-2 text-xs text-[#F4F4F0]">
+                {exp.deliverables.map((item, dIdx) => (
+                  <div key={dIdx} className="flex items-start gap-2">
+                    <span className="text-[#67E8F9]">&gt;</span>
                     <span>{item}</span>
                   </div>
                 ))}

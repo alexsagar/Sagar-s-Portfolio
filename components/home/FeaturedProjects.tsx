@@ -1,83 +1,108 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
-import { FolderGit2, Star, GitFork, ExternalLink, ArrowUpRight } from "lucide-react";
-import { fetchUserRepositories } from "@/lib/github/repositories";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { GitHubRepository } from "@/lib/github/types";
 
 interface FeaturedProjectsProps {
   repositories?: GitHubRepository[];
 }
 
-export async function FeaturedProjects({ repositories }: FeaturedProjectsProps) {
-  const repos = repositories || (await fetchUserRepositories());
-  const featured = repos.slice(0, 3);
+export function FeaturedProjects({ repositories = [] }: FeaturedProjectsProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const featured = repositories.slice(0, 3);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      if (cardsRef.current) {
+        gsap.from(cardsRef.current.children, {
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+          },
+        });
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section id="projects" className="py-24 border-b border-[#1A1D23] bg-[#070809]">
+    <section ref={sectionRef} id="projects" className="py-24 border-b border-[#1F2228] bg-[#070809]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 font-mono">
           <div>
-            <div className="font-mono text-xs text-[#67E8F9] uppercase tracking-widest mb-2 flex items-center gap-2">
-              <FolderGit2 className="w-4 h-4" />
-              <span>FEATURED WORK</span>
+            <div className="text-xs text-[#67E8F9] uppercase tracking-widest mb-2">
+              [01] // FEATURED ENGINEERING SYSTEMS
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#F4F4F0] tracking-tight">
-              Selected Engineering Projects
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#F4F4F0] tracking-tight font-sans">
+              System Implementations & Repositories
             </h2>
           </div>
 
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 font-mono text-xs text-[#67E8F9] hover:underline group"
+            className="text-xs text-[#67E8F9] hover:underline uppercase tracking-wider"
           >
-            <span>VIEW ALL PROJECTS ({repos.length})</span>
-            <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            VIEW ALL REPOSITORIES ({repositories.length}) &rarr;
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {featured.map((repo) => (
+        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {featured.map((repo, idx) => (
             <div
               key={repo.id}
-              className="bg-[#101215] border border-[#1F2228] rounded-xl p-6 flex flex-col justify-between hover:border-[#67E8F9]/40 transition-colors group space-y-6"
+              className="bg-[#101215] border border-[#1F2228] rounded-none p-6 flex flex-col justify-between hover:border-[#67E8F9]/50 transition-colors space-y-6"
             >
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs px-2.5 py-1 rounded bg-[#15171B] border border-[#1F2228] text-[#67E8F9]">
-                    {repo.primaryLanguage || "TypeScript"}
+                <div className="flex items-center justify-between font-mono text-xs">
+                  <span className="text-[#67E8F9] uppercase">
+                    SYS.0{idx + 1} &bull; {repo.primaryLanguage || "TypeScript"}
                   </span>
-                  <div className="flex items-center gap-3 text-xs font-mono text-[#92969D]">
-                    <span className="flex items-center gap-1">
-                      <Star className="w-3.5 h-3.5 text-yellow-500" />
-                      {repo.stars}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <GitFork className="w-3.5 h-3.5" />
-                      {repo.forks}
-                    </span>
-                  </div>
+                  <span className="text-[#92969D]">
+                    STARS: {repo.stars} | FORKS: {repo.forks}
+                  </span>
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-bold text-[#F4F4F0] group-hover:text-[#67E8F9] transition-colors">
+                  <h3 className="text-xl font-bold text-[#F4F4F0] font-sans">
                     {repo.name}
                   </h3>
-                  <p className="text-xs text-[#92969D] mt-2 line-clamp-3 leading-relaxed">
-                    {repo.description || "No description provided."}
+                  <p className="text-xs text-[#92969D] mt-2 leading-relaxed font-sans">
+                    {repo.description || "Production repository codebase."}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border-t border-[#1F2228] pt-4 font-mono text-xs">
+              <div className="border-t border-[#1F2228] pt-4 font-mono text-xs flex items-center justify-between text-[#92969D]">
                 <a
                   href={repo.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#92969D] hover:text-[#F4F4F0] flex items-center gap-1 transition-colors"
+                  className="hover:text-[#F4F4F0] transition-colors"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span>GitHub Repository</span>
+                  SOURCE CODE [GITHUB] &rarr;
                 </a>
+                {repo.homepage && (
+                  <a
+                    href={repo.homepage}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#67E8F9] hover:underline"
+                  >
+                    DEMO &rarr;
+                  </a>
+                )}
               </div>
             </div>
           ))}
