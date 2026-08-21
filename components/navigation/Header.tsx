@@ -22,15 +22,15 @@ export function Header() {
             <Link href="/projects" className="hover:text-[#F4F4F0] transition-colors">
               [01] PROJECTS
             </Link>
-            <a href="#experience" className="hover:text-[#F4F4F0] transition-colors">
-              [02] EXPERIENCE
-            </a>
-            <a href="#stack" className="hover:text-[#F4F4F0] transition-colors">
-              [03] ARCHITECTURE
-            </a>
-            <a href="#contact" className="hover:text-[#F4F4F0] transition-colors">
+            <Link href="/about" className="hover:text-[#F4F4F0] transition-colors">
+              [02] ABOUT
+            </Link>
+            <Link href="/lab" className="hover:text-[#F4F4F0] transition-colors">
+              [03] LAB
+            </Link>
+            <Link href="/contact" className="hover:text-[#F4F4F0] transition-colors">
               [04] CONTACT
-            </a>
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">
