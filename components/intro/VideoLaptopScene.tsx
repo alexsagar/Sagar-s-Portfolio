@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 
 interface VideoLaptopSceneProps {
@@ -10,7 +10,9 @@ interface VideoLaptopSceneProps {
 export function VideoLaptopScene({ onComplete }: VideoLaptopSceneProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const terminalScreenRef = useRef<HTMLDivElement>(null);
   const completedRef = useRef(false);
+  const [terminalVisible, setTerminalVisible] = useState(false);
 
   const triggerComplete = useRef(onComplete);
   triggerComplete.current = onComplete;
@@ -18,28 +20,28 @@ export function VideoLaptopScene({ onComplete }: VideoLaptopSceneProps) {
   useEffect(() => {
     const video = videoRef.current;
     const container = containerRef.current;
+    const terminalScreen = terminalScreenRef.current;
 
     if (!video || !container) return;
 
-    // Ensure video is played
     video.play().catch((err) => {
       console.warn("Video playback warning:", err);
     });
 
-    // Safety fallback timer (max 7.5s)
+    // Safety fallback timer (max 8.5s)
     const fallbackTimer = setTimeout(() => {
       if (!completedRef.current) {
         completedRef.current = true;
         triggerComplete.current();
       }
-    }, 7500);
+    }, 8500);
 
-    // Unhurried, cinematic GSAP zoom timeline
-    // 1. Visitor watches the full photorealistic laptop open cleanly (0.0s to 2.5s)
-    // 2. Camera slowly and continuously pushes into the screen center (2.5s to 5.5s)
-    // 3. Smooth handoff to interactive Terminal
+    // Sequence:
+    // 1. Laptop opens in video (0.0s - 1.2s)
+    // 2. Terminal UI powers ON inside the laptop screen display (1.2s)
+    // 3. AFTER screen & terminal are visible, slowly zoom in towards screen (2.2s - 5.5s)
+    // 4. Handoff to full interactive Terminal (5.8s)
     const tl = gsap.timeline({
-      delay: 2.2, // Wait for laptop lid to open in video
       onComplete: () => {
         if (!completedRef.current) {
           completedRef.current = true;
@@ -48,12 +50,34 @@ export function VideoLaptopScene({ onComplete }: VideoLaptopSceneProps) {
       },
     });
 
-    tl.to(container, {
-      scale: 3.5,
-      transformOrigin: "50% 45%",
-      duration: 3.0,
-      ease: "power2.inOut",
+    // Step 1: Power ON Terminal UI inside the laptop display once screen is shown
+    tl.to({}, {
+      duration: 1.2,
+      onComplete: () => {
+        setTerminalVisible(true);
+      },
     });
+
+    // Step 2: Fade terminal overlay in inside the 3D video screen
+    if (terminalScreen) {
+      tl.to(terminalScreen, {
+        opacity: 1,
+        duration: 0.8,
+        ease: "power1.inOut",
+      });
+    }
+
+    // Step 3: ONLY AFTER terminal is shown on laptop screen, zoom in slowly toward display
+    tl.to(
+      container,
+      {
+        scale: 3.6,
+        transformOrigin: "50% 46%",
+        duration: 3.2,
+        ease: "power2.inOut",
+      },
+      "+=0.4"
+    );
 
     return () => {
       tl.kill();
@@ -63,11 +87,12 @@ export function VideoLaptopScene({ onComplete }: VideoLaptopSceneProps) {
 
   return (
     <div className="fixed inset-0 z-40 bg-[#050607] overflow-hidden flex items-center justify-center">
-      {/* Zoomable Container */}
+      {/* Zoomable Video Container */}
       <div
         ref={containerRef}
-        className="relative w-full max-w-4xl aspect-video flex items-center justify-center bg-[#050607]"
+        className="relative w-full max-w-5xl aspect-video flex items-center justify-center bg-[#050607]"
       >
+        {/* Laptop Opening MP4 Video */}
         <video
           ref={videoRef}
           muted
@@ -82,11 +107,63 @@ export function VideoLaptopScene({ onComplete }: VideoLaptopSceneProps) {
           />
           Your browser does not support the video tag.
         </video>
+
+        {/* 
+          TERMINAL UI EMBEDDED DIRECTLY INSIDE LAPTOP SCREEN
+          Mapped over the green screen area of the laptop display
+        */}
+        <div
+          ref={terminalScreenRef}
+          className={`absolute opacity-0 w-[54%] h-[50%] top-[23%] left-[23%] bg-[#050607] border border-[#1F2228] p-4 sm:p-6 font-mono text-[10px] sm:text-xs text-[#F4F4F0] selection:bg-[#67E8F9] selection:text-[#050607] rounded shadow-2xl overflow-hidden flex flex-col justify-between transition-opacity duration-700 ${
+            terminalVisible ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <div className="space-y-3">
+            {/* Terminal Header */}
+            <div className="flex items-center justify-between border-b border-[#1F2228] pb-2 text-[#8B9098]">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-red-500/80 inline-block" />
+                <span className="w-2 h-2 rounded-full bg-yellow-500/80 inline-block" />
+                <span className="w-2 h-2 rounded-full bg-green-500/80 inline-block" />
+                <span className="ml-2 font-bold text-[#F4F4F0]">sagar@portfolio:~$</span>
+              </div>
+              <div className="hidden sm:block text-[10px]">SAGAR.DEV // OS v2.0</div>
+            </div>
+
+            {/* Terminal Screen Body */}
+            <div className="space-y-1.5 text-[#8B9098]">
+              <div className="text-[#F4F4F0] font-bold">SAGAR NEPALI - FULL-STACK SOFTWARE ENGINEER</div>
+              <div>Booting workspace environment...</div>
+              <div className="text-[#67E8F9]">Status: System Online &bull; Ready</div>
+            </div>
+
+            {/* Terminal Command Chips */}
+            <div className="pt-1 text-[11px]">
+              <div className="text-[#67E8F9] font-bold">System Commands:</div>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {["about", "projects", "experience", "skills", "contact", "help"].map((cmd) => (
+                  <span
+                    key={cmd}
+                    className="px-1.5 py-0.5 rounded bg-[#15171B] border border-[#1F2228] text-[#67E8F9]"
+                  >
+                    [ {cmd} ]
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Terminal Prompt Cursor */}
+          <div className="flex items-center gap-2 text-[#67E8F9] font-bold pt-2 border-t border-[#1F2228]">
+            <span>sagar@portfolio:~$</span>
+            <span className="w-2 h-3 bg-[#67E8F9] animate-pulse inline-block" />
+          </div>
+        </div>
       </div>
 
       {/* Overlay Status Note */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-xs text-[#8B9098] tracking-widest uppercase pointer-events-none">
-        INITIALIZING SYSTEM WORKSPACE...
+        INITIALIZING WORKSPACE ENVIRONMENT...
       </div>
     </div>
   );
