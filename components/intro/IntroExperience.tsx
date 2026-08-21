@@ -12,45 +12,62 @@ export function IntroExperience() {
   const [skipIntro, setSkipIntro] = useState(false);
   const [canvasOpacity, setCanvasOpacity] = useState(1);
 
+  // Absolute hard safety timer: if ANYTHING in WebGL/R3F/Loader stalls, force terminal after 2.5s
   useEffect(() => {
-    // Check prefers-reduced-motion
+    const hardTimer = setTimeout(() => {
+      setStep("terminal");
+    }, 2500);
+
+    return () => clearTimeout(hardTimer);
+  }, []);
+
+  useEffect(() => {
+    // Check prefers-reduced-motion or WebGL availability
     if (typeof window !== "undefined") {
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (prefersReducedMotion) {
+      
+      // Simple WebGL check
+      let webglAvailable = true;
+      try {
+        const canvas = document.createElement("canvas");
+        webglAvailable = Boolean(window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")));
+      } catch (e) {
+        webglAvailable = false;
+      }
+
+      if (prefersReducedMotion || !webglAvailable) {
         setStep("terminal");
         setSkipIntro(true);
       }
     }
   }, []);
 
-  const handleSkip = () => {
+  const handleSkip = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setSkipIntro(true);
     setStep("terminal");
   };
 
   const handleScreenFill = () => {
-    // Smoothly fade out WebGL canvas overlay as terminal DOM takes full viewport
     setCanvasOpacity(0);
   };
 
-  if (skipIntro) {
+  if (skipIntro || step === "terminal") {
     return <Terminal />;
   }
 
   return (
-    <div className="relative min-h-screen bg-[#050607]">
+    <div
+      onClick={() => handleSkip()}
+      className="relative min-h-screen bg-[#050607] cursor-pointer"
+    >
       {/* Skip Intro Button */}
       <button
         onClick={handleSkip}
         className="fixed top-6 right-6 z-50 font-mono text-xs text-[#8B9098] hover:text-[#67E8F9] px-3 py-1.5 rounded bg-[#0B0D10]/90 border border-[#1F2228] transition-colors backdrop-blur-sm"
       >
-        [ Skip Intro ]
+        [ Skip Intro / Click Anywhere ]
       </button>
-
-      {/* DOM Terminal behind canvas */}
-      <div className={step === "terminal" ? "opacity-100 transition-opacity duration-500" : "opacity-0 pointer-events-none"}>
-        <Terminal />
-      </div>
 
       {/* Boot Loader */}
       {step === "boot" && (
@@ -60,7 +77,7 @@ export function IntroExperience() {
       {/* 3D Laptop Scene Overlay */}
       {step === "laptop" && (
         <div
-          className="fixed inset-0 z-40 transition-opacity duration-700 ease-out"
+          className="fixed inset-0 z-40 transition-opacity duration-500 ease-out"
           style={{ opacity: canvasOpacity }}
         >
           <LaptopScene

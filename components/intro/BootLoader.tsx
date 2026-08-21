@@ -15,7 +15,7 @@ export function BootLoader({ onComplete }: BootLoaderProps) {
   triggerComplete.current = onComplete;
 
   useEffect(() => {
-    // Bulletproof progress timer
+    // Fast 500ms progress timer
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -26,21 +26,21 @@ export function BootLoader({ onComplete }: BootLoaderProps) {
           }
           return 100;
         }
-        const next = prev + 25;
+        const next = prev + 35;
         if (next > 35) setStep(1);
         if (next > 70) setStep(2);
         return Math.min(100, next);
       });
-    }, 150);
+    }, 80);
 
-    // Absolute fallback safety timeout (max 1.5s)
+    // Hard fallback after 800ms
     const fallbackTimer = setTimeout(() => {
       clearInterval(interval);
       if (!completedRef.current) {
         completedRef.current = true;
         triggerComplete.current();
       }
-    }, 1500);
+    }, 800);
 
     return () => {
       clearInterval(interval);
@@ -85,7 +85,7 @@ export function BootLoader({ onComplete }: BootLoaderProps) {
         <div className="space-y-2 pt-4">
           <div className="h-1 w-full bg-[#15171B] overflow-hidden rounded">
             <div
-              className="h-full bg-[#67E8F9] transition-all duration-150 ease-out"
+              className="h-full bg-[#67E8F9] transition-all duration-100 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
