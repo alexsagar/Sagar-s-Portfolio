@@ -21,71 +21,72 @@ export function VideoLaptopScene({ onComplete }: VideoLaptopSceneProps) {
 
     if (!video || !container) return;
 
-    // Safety fallback (max 5.5s)
+    // Ensure video is played
+    video.play().catch((err) => {
+      console.warn("Video playback warning:", err);
+    });
+
+    // Safety fallback timer (max 7.5s)
     const fallbackTimer = setTimeout(() => {
       if (!completedRef.current) {
         completedRef.current = true;
         triggerComplete.current();
       }
-    }, 5500);
+    }, 7500);
 
-    const startAnimation = () => {
-      // GSAP Timeline synced with Video playback:
-      // 1. Video plays laptop opening.
-      // 2. Camera zooms into the screen.
-      // 3. Transition to terminal.
-      const tl = gsap.timeline({
-        onComplete: () => {
-          if (!completedRef.current) {
-            completedRef.current = true;
-            triggerComplete.current();
-          }
-        },
-      });
-
-      tl.to(
-        container,
-        {
-          scale: 3.6,
-          transformOrigin: "50% 45%",
-          duration: 2.2,
-          ease: "power3.inOut",
-          delay: 1.2,
+    // Unhurried, cinematic GSAP zoom timeline
+    // 1. Visitor watches the full photorealistic laptop open cleanly (0.0s to 2.5s)
+    // 2. Camera slowly and continuously pushes into the screen center (2.5s to 5.5s)
+    // 3. Smooth handoff to interactive Terminal
+    const tl = gsap.timeline({
+      delay: 2.2, // Wait for laptop lid to open in video
+      onComplete: () => {
+        if (!completedRef.current) {
+          completedRef.current = true;
+          triggerComplete.current();
         }
-      );
-    };
+      },
+    });
 
-    video.addEventListener("play", startAnimation);
-
-    video.play().catch(() => {
-      startAnimation();
+    tl.to(container, {
+      scale: 3.5,
+      transformOrigin: "50% 45%",
+      duration: 3.0,
+      ease: "power2.inOut",
     });
 
     return () => {
-      video.removeEventListener("play", startAnimation);
+      tl.kill();
       clearTimeout(fallbackTimer);
     };
   }, []);
 
   return (
     <div className="fixed inset-0 z-40 bg-[#050607] overflow-hidden flex items-center justify-center">
-      {/* Zoomable Video Container */}
+      {/* Zoomable Container */}
       <div
         ref={containerRef}
-        className="relative w-full max-w-5xl aspect-video flex items-center justify-center"
+        className="relative w-full max-w-4xl aspect-video flex items-center justify-center bg-[#050607]"
       >
         <video
           ref={videoRef}
-          src="/vecteezy_laptop-animation-with-green-screen-with-markers-for-tracking_47225425.mp4"
           muted
+          autoPlay
           playsInline
-          className="w-full h-full object-contain rounded-lg shadow-2xl"
-        />
+          preload="auto"
+          className="w-full h-full object-contain bg-[#050607]"
+        >
+          <source
+            src="/vecteezy_laptop-animation-with-green-screen-with-markers-for-tracking_47225425.mp4"
+            type="video/mp4"
+          />
+          Your browser does not support the video tag.
+        </video>
       </div>
 
       {/* Overlay Status Note */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-xs text-[#8B9098] tracking-widest uppercase pointer-events-none">
-        BOOTING WORKSPACE ENVIRONMENT...
+        INITIALIZING SYSTEM WORKSPACE...
       </div>
     </div>
   );

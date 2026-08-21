@@ -10,6 +10,15 @@ type Step = "boot" | "laptop" | "terminal";
 export function IntroExperience() {
   const [step, setStep] = useState<Step>("boot");
 
+  // Absolute hard safety timer: if ANYTHING stalls, force terminal after 7.5s
+  useEffect(() => {
+    const hardTimer = setTimeout(() => {
+      setStep("terminal");
+    }, 7500);
+
+    return () => clearTimeout(hardTimer);
+  }, []);
+
   useEffect(() => {
     // Check prefers-reduced-motion
     if (typeof window !== "undefined") {
