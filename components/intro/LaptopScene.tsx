@@ -1,132 +1,179 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import React, { useRef, useEffect, useState } from "react";
+import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { gsap } from "gsap";
+import { LaptopModel, LaptopModelRef } from "./LaptopModel";
+import { CameraRig, CameraRigRef } from "./CameraRig";
 
 interface LaptopSceneProps {
   onComplete: () => void;
+  onScreenFill?: () => void;
 }
 
-function ProceduralLaptop({ onComplete }: { onComplete: () => void }) {
-  const lidGroupRef = useRef<THREE.Group>(null);
-  const screenMeshRef = useRef<THREE.Mesh>(null);
-  const cameraRef = useRef<THREE.PerspectiveCamera>(null);
+const CLOSED_ANGLE = 0.0;
+const OPEN_ANGLE = 1.90; // Opens upward and leans back ~108 degrees relative to hinge
 
-  useEffect(() => {
-    // GSAP Timeline for Laptop opening & Camera zoom into screen
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setTimeout(onComplete, 400);
-      },
-    });
+export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
+  const laptopRef = useRef<LaptopModelRef>(null);
+  const rigRef = useRef<CameraRigRef>(null);
 
-    // 1. Open Lid (pivot angle 0 to 1.9 radians)
-    if (lidGroupRef.current) {
-      tl.to(lidGroupRef.current.rotation, {
-        x: -1.9,
-        duration: 1.8,
-        ease: "power2.inOut",
-        delay: 0.5,
-      });
-    }
-
-    // 2. Power on Screen emissive intensity
-    if (screenMeshRef.current) {
-      const mat = screenMeshRef.current.material as THREE.MeshStandardMaterial;
-      tl.to(
-        mat,
-        {
-          emissiveIntensity: 1.5,
-          duration: 0.6,
-          ease: "power1.in",
-        },
-        "-=0.6"
-      );
-    }
-  }, [onComplete]);
-
-  return (
-    <group position={[0, -1, 0]}>
-      {/* Laptop Base (Body) */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[6, 0.25, 4.2]} />
-        <meshStandardMaterial color="#15171B" metalness={0.8} roughness={0.2} />
-      </mesh>
-
-      {/* Keyboard Surface Accent */}
-      <mesh position={[0, 0.13, 0.2]}>
-        <boxGeometry args={[5.2, 0.02, 2.4]} />
-        <meshStandardMaterial color="#0B0D10" roughness={0.8} />
-      </mesh>
-
-      {/* Trackpad Accent */}
-      <mesh position={[0, 0.13, 1.4]}>
-        <boxGeometry args={[1.8, 0.02, 1.1]} />
-        <meshStandardMaterial color="#1F2228" roughness={0.4} />
-      </mesh>
-
-      {/* Laptop Lid Pivot Group (Hinge at Z = -2.1) */}
-      <group ref={lidGroupRef} position={[0, 0.12, -2.1]}>
-        {/* Lid Shell */}
-        <mesh position={[0, 1.9, 0]}>
-          <boxGeometry args={[6, 3.8, 0.15]} />
-          <meshStandardMaterial color="#15171B" metalness={0.85} roughness={0.25} />
-        </mesh>
-
-        {/* Display Bezel */}
-        <mesh position={[0, 1.9, 0.08]}>
-          <boxGeometry args={[5.7, 3.5, 0.02]} />
-          <meshStandardMaterial color="#050607" roughness={0.9} />
-        </mesh>
-
-        {/* Display Screen Canvas */}
-        <mesh ref={screenMeshRef} position={[0, 1.9, 0.1]}>
-          <planeGeometry args={[5.4, 3.2]} />
-          <meshStandardMaterial
-            color="#070809"
-            emissive="#67E8F9"
-            emissiveIntensity={0.0}
-            roughness={0.1}
-          />
-        </mesh>
-      </group>
-    </group>
-  );
-}
-
-function CameraController({ onComplete }: { onComplete: () => void }) {
-  useFrame(({ camera }) => {
-    // Subtle camera float
-    camera.lookAt(0, 0.5, 0);
+  // Debug metrics state
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugData, setDebugData] = useState({
+    camPos: "0.00, 1.80, 6.00",
+    targetPos: "0.00, 0.40, 0.00",
+    lidAngle: "0.00°",
+    progress: "0%",
   });
 
   useEffect(() => {
-    // Zoom camera toward screen
-  }, []);
+    const timer = setTimeout(() => {
+      if (!laptopRef.current || !rigRef.current) return;
 
-  return null;
-}
+      const laptop = laptopRef.current;
+      const rig = rigRef.current;
 
-export function LaptopScene({ onComplete }: LaptopSceneProps) {
+      const screenPos = laptop.getScreenWorldPosition();
+
+      // Master GSAP Timeline for Natural Cinematic Opening
+      const tl = gsap.timeline({
+        onUpdate: () => {
+          if (laptop.lidPivot && rig.position && rig.target) {
+            const rad = laptop.lidPivot.rotation.x;
+            const deg = (rad * (180 / Math.PI)).toFixed(1);
+            setDebugData({
+              camPos: `${rig.position.x.toFixed(2)}, ${rig.position.y.toFixed(2)}, ${rig.position.z.toFixed(2)}`,
+              targetPos: `${rig.target.x.toFixed(2)}, ${rig.target.y.toFixed(2)}, ${rig.target.z.toFixed(2)}`,
+              lidAngle: `${deg}° (${rad.toFixed(2)}rad)`,
+              progress: `${Math.round(tl.progress() * 100)}%`,
+            });
+          }
+        },
+        onComplete: () => {
+          if (onScreenFill) onScreenFill();
+          setTimeout(onComplete, 300);
+        },
+      });
+
+      // Step 1: Open Lid smoothly around hinge pivot (0.0 to 1.90 radians)
+      if (laptop.lidPivot) {
+        laptop.lidPivot.rotation.x = CLOSED_ANGLE;
+
+        tl.to(laptop.lidPivot.rotation, {
+          x: OPEN_ANGLE,
+          duration: 2.2,
+          ease: "power3.inOut",
+        });
+      }
+
+      // Step 2: Power on Screen Emissive Light & Reflection as lid reaches open state
+      if (laptop.screenMesh && laptop.screenGlow) {
+        const mat = laptop.screenMesh.material as THREE.MeshStandardMaterial;
+
+        tl.to(
+          mat,
+          {
+            emissiveIntensity: 1.5,
+            duration: 0.8,
+            ease: "power1.in",
+          },
+          "-=0.6"
+        );
+
+        tl.to(
+          laptop.screenGlow,
+          {
+            intensity: 2.5,
+            duration: 0.8,
+            ease: "power1.in",
+          },
+          "-=0.8"
+        );
+      }
+
+      // Step 3: Animate Camera Position & Target Vector directly into Screen Center
+      rig.updateCameraNear(0.01);
+
+      tl.to(
+        rig.position,
+        {
+          x: 0.0,
+          y: 1.2,
+          z: 2.2,
+          duration: 1.8,
+          ease: "power2.inOut",
+        },
+        "+=0.2"
+      );
+
+      tl.to(
+        rig.target,
+        {
+          x: screenPos.x,
+          y: screenPos.y,
+          z: screenPos.z,
+          duration: 1.8,
+          ease: "power2.inOut",
+        },
+        "<"
+      );
+
+      // Final Push into Display Surface (Screen Fills Viewport)
+      tl.to(
+        rig.position,
+        {
+          x: screenPos.x,
+          y: screenPos.y,
+          z: screenPos.z + 0.35, // Stop right in front of screen
+          duration: 1.2,
+          ease: "power3.in",
+        },
+        "-=0.4"
+      );
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [onComplete, onScreenFill]);
+
   return (
     <div className="fixed inset-0 z-40 bg-[#050607]">
       <Canvas
-        camera={{ position: [0, 2, 8], fov: 45 }}
+        camera={{ position: [0, 1.8, 6.0], fov: 45, near: 0.1 }}
         gl={{ antialias: true, alpha: false }}
+        dpr={[1, 1.5]}
         className="w-full h-full"
       >
         <color attach="background" args={["#050607"]} />
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 8, 5]} intensity={1.5} color="#F4F4F0" />
-        <pointLight position={[-4, 3, 2]} intensity={0.8} color="#67E8F9" />
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[4, 7, 4]} intensity={1.2} color="#F4F4F0" />
+        <pointLight position={[-3, 2, 2]} intensity={0.6} color="#67E8F9" />
 
-        <ProceduralLaptop onComplete={onComplete} />
-        <CameraController onComplete={onComplete} />
+        <LaptopModel ref={laptopRef} />
+        <CameraRig ref={rigRef} />
       </Canvas>
 
-      {/* Overlay status note */}
+      {/* Debug UI Toggle & Dashboard (Dev mode) */}
+      <div className="absolute bottom-4 left-4 z-50 font-mono text-[10px] text-[#8B9098]">
+        <button
+          onClick={() => setShowDebug(!showDebug)}
+          className="px-2 py-1 bg-[#101215] border border-[#1F2228] hover:text-[#67E8F9] rounded"
+        >
+          [ {showDebug ? "Hide Debug" : "Show Debug"} ]
+        </button>
+
+        {showDebug && (
+          <div className="mt-2 bg-[#0B0D10]/90 border border-[#1F2228] p-3 rounded space-y-1 text-[#F4F4F0] backdrop-blur-sm">
+            <div>CAM POS : {debugData.camPos}</div>
+            <div>TARGET  : {debugData.targetPos}</div>
+            <div>LID ANGLE: {debugData.lidAngle}</div>
+            <div>PROGRESS : {debugData.progress}</div>
+          </div>
+        )}
+      </div>
+
+      {/* Overlay Status Note */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-xs text-[#8B9098] tracking-widest uppercase pointer-events-none">
         BOOTING WORKSPACE ENVIRONMENT...
       </div>

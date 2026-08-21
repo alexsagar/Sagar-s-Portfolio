@@ -10,6 +10,7 @@ type Step = "boot" | "laptop" | "terminal";
 export function IntroExperience() {
   const [step, setStep] = useState<Step>("boot");
   const [skipIntro, setSkipIntro] = useState(false);
+  const [canvasOpacity, setCanvasOpacity] = useState(1);
 
   useEffect(() => {
     // Check prefers-reduced-motion
@@ -27,7 +28,12 @@ export function IntroExperience() {
     setStep("terminal");
   };
 
-  if (skipIntro || step === "terminal") {
+  const handleScreenFill = () => {
+    // Smoothly fade out WebGL canvas overlay as terminal DOM takes full viewport
+    setCanvasOpacity(0);
+  };
+
+  if (skipIntro) {
     return <Terminal />;
   }
 
@@ -36,17 +42,32 @@ export function IntroExperience() {
       {/* Skip Intro Button */}
       <button
         onClick={handleSkip}
-        className="fixed top-6 right-6 z-50 font-mono text-xs text-[#8B9098] hover:text-[#67E8F9] px-3 py-1.5 rounded bg-[#0B0D10] border border-[#1F2228] transition-colors"
+        className="fixed top-6 right-6 z-50 font-mono text-xs text-[#8B9098] hover:text-[#67E8F9] px-3 py-1.5 rounded bg-[#0B0D10]/90 border border-[#1F2228] transition-colors backdrop-blur-sm"
       >
         [ Skip Intro ]
       </button>
 
+      {/* DOM Terminal behind canvas */}
+      <div className={step === "terminal" ? "opacity-100 transition-opacity duration-500" : "opacity-0 pointer-events-none"}>
+        <Terminal />
+      </div>
+
+      {/* Boot Loader */}
       {step === "boot" && (
         <BootLoader onComplete={() => setStep("laptop")} />
       )}
 
+      {/* 3D Laptop Scene Overlay */}
       {step === "laptop" && (
-        <LaptopScene onComplete={() => setStep("terminal")} />
+        <div
+          className="fixed inset-0 z-40 transition-opacity duration-700 ease-out"
+          style={{ opacity: canvasOpacity }}
+        >
+          <LaptopScene
+            onScreenFill={handleScreenFill}
+            onComplete={() => setStep("terminal")}
+          />
+        </div>
       )}
     </div>
   );

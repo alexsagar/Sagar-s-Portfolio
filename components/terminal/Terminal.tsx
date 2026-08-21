@@ -7,6 +7,29 @@ interface HistoryEntry {
   command: string;
   output: CommandOutput;
   timestamp: string;
+  isStreaming?: boolean;
+}
+
+// Fast Gemini AI-style typewriter streaming component
+function StreamedText({ text, onComplete }: { text: string; onComplete?: () => void }) {
+  const [displayed, setDisplayed] = useState("");
+
+  useEffect(() => {
+    let index = 0;
+    const speed = 12; // Fast typing speed (12ms per char)
+    const timer = setInterval(() => {
+      index++;
+      setDisplayed(text.slice(0, index));
+      if (index >= text.length) {
+        clearInterval(timer);
+        if (onComplete) onComplete();
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, onComplete]);
+
+  return <span>{displayed}</span>;
 }
 
 export function Terminal() {
@@ -55,7 +78,10 @@ export function Terminal() {
     }
 
     const now = new Date().toLocaleTimeString("en-US", { hour12: false });
-    setHistory((prev) => [...prev, { command: cmdText, output, timestamp: now }]);
+    setHistory((prev) => [
+      ...prev,
+      { command: cmdText, output, timestamp: now, isStreaming: true },
+    ]);
     setCmdHistory((prev) => [...prev, cmdText]);
     setCmdHistoryIndex(-1);
     setInput("");
@@ -107,7 +133,7 @@ export function Terminal() {
 
           <div className="flex items-center gap-4 text-[11px]">
             <span>SYSTEM: SAGAR.DEV OS v2.0</span>
-            <span className="text-[#67E8F9]">READY</span>
+            <span className="text-[#67E8F9]">AI STREAM: ONLINE</span>
           </div>
         </div>
 
@@ -149,17 +175,21 @@ export function Terminal() {
 
               <div className="pl-4 border-l border-[#1F2228] space-y-2">
                 {entry.output.title && (
-                  <div className="font-bold text-[#67E8F9]">{entry.output.title}</div>
+                  <div className="font-bold text-[#67E8F9]">
+                    <StreamedText text={entry.output.title} />
+                  </div>
                 )}
 
                 {Array.isArray(entry.output.content) ? (
                   entry.output.content.map((line, lIdx) => (
                     <div key={lIdx} className="text-[#8B9098] leading-relaxed">
-                      {line}
+                      <StreamedText text={line} />
                     </div>
                   ))
                 ) : (
-                  <div className="text-[#8B9098] leading-relaxed">{entry.output.content}</div>
+                  <div className="text-[#8B9098] leading-relaxed">
+                    <StreamedText text={entry.output.content} />
+                  </div>
                 )}
 
                 {entry.output.links && (
@@ -172,7 +202,7 @@ export function Terminal() {
                         rel="noopener noreferrer"
                         className="text-[#67E8F9] hover:underline flex items-center gap-1"
                       >
-                        <span>{link.label}</span>
+                        <StreamedText text={link.label} />
                         <span>&rarr;</span>
                       </a>
                     ))}
