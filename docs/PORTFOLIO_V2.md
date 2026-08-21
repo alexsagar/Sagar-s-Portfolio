@@ -1,7 +1,7 @@
 # Portfolio v2 - Engineering Progress & Architecture
 
 ## Overview
-This document tracks the ongoing transformation of Sagar Nepali's personal portfolio (https://sagar-nepali.com.np) from a template-based site into a premium, engineering console portfolio with Payload CMS backend, PostgreSQL database, server-side GitHub REST API integration, command palette navigation, and technical project case studies.
+This document tracks the transformation of Sagar Nepali's personal portfolio (https://sagar-nepali.com.np) into an interactive software workspace experience with cinematic boot sequence, 3D laptop WebGL scene, functional terminal interface, and dynamic project showcase.
 
 ---
 
@@ -9,68 +9,39 @@ This document tracks the ongoing transformation of Sagar Nepali's personal portf
 
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS v3 + CSS Variables custom design system (Geist / Geist Mono typography)
+- **3D Graphics**: Three.js & React Three Fiber (`@react-three/fiber`, `@react-three/drei`)
+- **Animations**: GSAP (GreenSock) & GSAP ScrollTrigger
+- **Scroll Engine**: Lenis Smooth Inertia Scroll
+- **Styling**: Tailwind CSS (Utility-first design system with Geist Sans / Geist Mono typography)
 - **CMS / Backend**: Payload CMS 3.x (`/admin`) with PostgreSQL Database (`@payloadcms/db-postgres`)
-- **GitHub Integration**: Server-side GitHub REST API client with ISR/caching (`lib/github`)
-- **Command Palette**: `cmdk` modal trigger with `Ctrl+K` keybindings
-- **Icons**: Lucide React / Tabler Icons
 
 ---
 
-## Environment Variables Specs (`.env.example`)
+## Checkpoint 1 Deliverables — COMPLETED & VERIFIED
 
-```env
-# Site Configuration
-NEXT_PUBLIC_SITE_URL=https://sagar-nepali.com.np
-NEXT_PUBLIC_GITHUB_USERNAME=alexsagar
+### 1. Minimal Boot Loader ([components/intro/BootLoader.tsx](file:///D:/Portfolio%20sagar/portfolio/components/intro/BootLoader.tsx))
+- Minimal mono status screen (`SAGAR.DEV / SYSTEM BOOT`).
+- Stepwise telemetry initialization (`RENDERER`, `INTERFACE`, `WORKSPACE`).
+- ~1.5s–2.0s progressive load line.
 
-# GitHub Server-Side Integration
-GITHUB_TOKEN=your_github_personal_access_token_here
-GITHUB_USERNAME=alexsagar
+### 2. 3D Laptop WebGL Scene ([components/intro/LaptopScene.tsx](file:///D:/Portfolio%20sagar/portfolio/components/intro/LaptopScene.tsx))
+- Studio environment rendered in Three.js / R3F (`Canvas`).
+- Procedural laptop model with aluminum body, keyboard surface, trackpad, and screen.
+- GSAP timeline opening the lid from closed position to 110°, powering on the display screen.
 
-# Payload CMS & Database Configuration
-DATABASE_URI=postgresql://user:password@localhost:5432/portfolio_v2
-PAYLOAD_SECRET=your_super_secret_payload_key_here
-```
+### 3. Screen-to-Interface Transition & Terminal ([components/terminal/Terminal.tsx](file:///D:/Portfolio%20sagar/portfolio/components/terminal/Terminal.tsx))
+- Interactive terminal prompt (`sagar@portfolio:~$`).
+- Real-time command handlers: `help`, `about`, `projects`, `experience`, `skills`, `github`, `contact`, `resume`, `whoami`, `stack`, `clear`.
+- Non-technical clickable command chips (`[ About ]`, `[ Projects ]`, `[ Experience ]`, `[ Skills ]`, `[ Contact ]`, `[ GitHub ]`, `[ Help ]`).
+- Tab completion and Up/Down arrow history.
 
----
-
-## Routes Matrix
-
-| Route | Description | Rendering Mode |
-|---|---|---|
-| `/` | Homepage with developer status hero, featured projects, live GitHub activity, tech stack, experience timeline | Server + Dynamic GitHub/CMS Data |
-| `/projects` | Technical project explorer with category filtering and GitHub metadata | Server / Client Hybrid |
-| `/projects/[slug]` | Deep-dive technical case study with architecture, challenges, and live/GitHub links | Server (Dynamic Metadata) |
-| `/lab` | Interactive experiments & developer builds hub | Server / CMS-controlled |
-| `/about` | Biography, background, approach, and resume links | Server |
-| `/contact` | Rate-limited submission form persisted to Payload CMS contact messages | Client Form / Server Action |
-| `/admin/*` | Payload CMS Admin Dashboard | Payload Engine |
+### 4. Accessibility & Fallbacks ([components/intro/IntroExperience.tsx](file:///D:/Portfolio%20sagar/portfolio/components/intro/IntroExperience.tsx))
+- `[ Skip Intro ]` button fixed at top right.
+- `prefers-reduced-motion` auto-detection to bypass 3D cinematics for motion-sensitive users.
 
 ---
 
-## Implementation Progress
-
-### Phase 1: Foundation & Design System Setup — COMPLETED
-- [x] Switched repository to `portfolio-v2` branch.
-- [x] Created `docs/PORTFOLIO_V2.md` master documentation.
-- [x] Installed dependencies (`cmdk`, `geist`, `octokit`, Payload CMS prerequisites).
-- [x] Set up visual design system (Geist typography, `#070809` background, `#67E8F9` cyan accents).
-- [x] Built sticky header with `Ctrl+K` Command Palette navigation.
-- [x] Built Developer Status Hero section.
-
-### Phase 2: Server-Side GitHub Integration — COMPLETED
-- [x] Created `lib/github` abstraction (`types.ts`, `normalize.ts`, `repositories.ts`).
-- [x] Implemented revalidated fetching with fallback resilience for rate limits.
-- [x] Built live GitHub activity UI components (`LiveGitHubSection.tsx`).
-
-### Phase 3: Backend & Payload CMS Integration — IN PROGRESS
-- [x] Initialized Payload CMS config (`payload.config.ts`).
-- [ ] Configure Payload CMS collections (Projects, Experience, Skills, Messages).
-
----
-
-## Current Status & Next Steps
-- Fixed syntax/encoding issues across all TSX components.
-- Verified TypeScript compilation (`tsc --noEmit`).
-- Next step: Complete Phase 3 Payload CMS collections and Phase 4 Project case studies.
+## Build & Quality Assurance Status
+- **TypeScript (`npx tsc --noEmit`)**: 0 errors
+- **Next.js Production Build (`npm run build`)**: Succeeded (Exit code 0)
+- **Git Commit**: `fc7d0bd feat: build cinematic portfolio intro and terminal` on branch `portfolio-v2`
