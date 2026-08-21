@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 
 interface VideoLaptopSceneProps {
@@ -12,7 +12,6 @@ export function VideoLaptopScene({ onComplete }: VideoLaptopSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalScreenRef = useRef<HTMLDivElement>(null);
   const completedRef = useRef(false);
-  const [terminalVisible, setTerminalVisible] = useState(false);
 
   const triggerComplete = useRef(onComplete);
   triggerComplete.current = onComplete;
@@ -22,25 +21,28 @@ export function VideoLaptopScene({ onComplete }: VideoLaptopSceneProps) {
     const container = containerRef.current;
     const terminalScreen = terminalScreenRef.current;
 
-    if (!video || !container) return;
+    if (!video || !container || !terminalScreen) return;
+
+    // Initially hide terminal screen overlay completely until lid opens
+    gsap.set(terminalScreen, { opacity: 0, display: "none" });
 
     video.play().catch((err) => {
       console.warn("Video playback warning:", err);
     });
 
-    // Safety fallback timer (max 8.5s)
+    // Safety fallback timer (max 9.0s)
     const fallbackTimer = setTimeout(() => {
       if (!completedRef.current) {
         completedRef.current = true;
         triggerComplete.current();
       }
-    }, 8500);
+    }, 9000);
 
     // Sequence:
-    // 1. Laptop opens in video (0.0s - 1.2s)
-    // 2. Terminal UI powers ON inside the laptop screen display (1.2s)
-    // 3. AFTER screen & terminal are visible, slowly zoom in towards screen (2.2s - 5.5s)
-    // 4. Handoff to full interactive Terminal (5.8s)
+    // 0.0s - 1.8s: Laptop lid opens in video. Terminal is 100% INVISIBLE.
+    // 1.8s: Lid is fully open. Terminal screen powers ON inside laptop display.
+    // 2.6s: ONLY AFTER terminal is shown inside laptop screen, slowly zoom into display.
+    // 5.8s: Handoff to interactive full-screen Terminal.
     const tl = gsap.timeline({
       onComplete: () => {
         if (!completedRef.current) {
@@ -50,34 +52,27 @@ export function VideoLaptopScene({ onComplete }: VideoLaptopSceneProps) {
       },
     });
 
-    // Step 1: Power ON Terminal UI inside the laptop display once screen is shown
-    tl.to({}, {
-      duration: 1.2,
-      onComplete: () => {
-        setTerminalVisible(true);
-      },
+    // Step 1: Wait 1.8s while laptop lid opens in video
+    tl.to({}, { duration: 1.8 });
+
+    // Step 2: Show and fade in terminal overlay inside laptop screen
+    tl.to(terminalScreen, {
+      display: "flex",
+      opacity: 1,
+      duration: 0.6,
+      ease: "power1.in",
     });
 
-    // Step 2: Fade terminal overlay in inside the 3D video screen
-    if (terminalScreen) {
-      tl.to(terminalScreen, {
-        opacity: 1,
-        duration: 0.8,
-        ease: "power1.inOut",
-      });
-    }
+    // Step 3: Hold terminal visible on laptop screen before zooming
+    tl.to({}, { duration: 0.8 });
 
-    // Step 3: ONLY AFTER terminal is shown on laptop screen, zoom in slowly toward display
-    tl.to(
-      container,
-      {
-        scale: 3.6,
-        transformOrigin: "50% 46%",
-        duration: 3.2,
-        ease: "power2.inOut",
-      },
-      "+=0.4"
-    );
+    // Step 4: NOW slowly zoom into the laptop display
+    tl.to(container, {
+      scale: 3.6,
+      transformOrigin: "50% 46%",
+      duration: 3.2,
+      ease: "power2.inOut",
+    });
 
     return () => {
       tl.kill();
@@ -114,9 +109,8 @@ export function VideoLaptopScene({ onComplete }: VideoLaptopSceneProps) {
         */}
         <div
           ref={terminalScreenRef}
-          className={`absolute opacity-0 w-[54%] h-[50%] top-[23%] left-[23%] bg-[#050607] border border-[#1F2228] p-4 sm:p-6 font-mono text-[10px] sm:text-xs text-[#F4F4F0] selection:bg-[#67E8F9] selection:text-[#050607] rounded shadow-2xl overflow-hidden flex flex-col justify-between transition-opacity duration-700 ${
-            terminalVisible ? "opacity-100" : "opacity-0"
-          }`}
+          style={{ opacity: 0, display: "none" }}
+          className="absolute w-[54%] h-[50%] top-[23%] left-[23%] bg-[#050607] border border-[#1F2228] p-4 sm:p-6 font-mono text-[10px] sm:text-xs text-[#F4F4F0] selection:bg-[#67E8F9] selection:text-[#050607] rounded shadow-2xl overflow-hidden flex flex-col justify-between"
         >
           <div className="space-y-3">
             {/* Terminal Header */}
