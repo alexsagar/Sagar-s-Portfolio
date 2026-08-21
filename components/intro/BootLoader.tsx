@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 interface BootLoaderProps {
   onComplete: () => void;
@@ -9,24 +9,44 @@ interface BootLoaderProps {
 export function BootLoader({ onComplete }: BootLoaderProps) {
   const [progress, setProgress] = useState(0);
   const [step, setStep] = useState(0);
+  const completedRef = useRef(false);
+
+  const triggerComplete = useRef(onComplete);
+  triggerComplete.current = onComplete;
 
   useEffect(() => {
+    // Bulletproof progress timer
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(onComplete, 300);
+          if (!completedRef.current) {
+            completedRef.current = true;
+            triggerComplete.current();
+          }
           return 100;
         }
-        const next = prev + Math.floor(Math.random() * 20 + 15);
+        const next = prev + 25;
         if (next > 35) setStep(1);
         if (next > 70) setStep(2);
         return Math.min(100, next);
       });
-    }, 200);
+    }, 150);
 
-    return () => clearInterval(interval);
-  }, [onComplete]);
+    // Absolute fallback safety timeout (max 1.5s)
+    const fallbackTimer = setTimeout(() => {
+      clearInterval(interval);
+      if (!completedRef.current) {
+        completedRef.current = true;
+        triggerComplete.current();
+      }
+    }, 1500);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(fallbackTimer);
+    };
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 bg-[#050607] text-[#F4F4F0] font-mono flex flex-col justify-between p-8 selection:bg-[#67E8F9] selection:text-[#050607]">
@@ -65,7 +85,7 @@ export function BootLoader({ onComplete }: BootLoaderProps) {
         <div className="space-y-2 pt-4">
           <div className="h-1 w-full bg-[#15171B] overflow-hidden rounded">
             <div
-              className="h-full bg-[#67E8F9] transition-all duration-200 ease-out"
+              className="h-full bg-[#67E8F9] transition-all duration-150 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>

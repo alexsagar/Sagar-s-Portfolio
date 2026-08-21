@@ -18,6 +18,13 @@ const OPEN_ANGLE = 1.90; // Opens upward and leans back ~108 degrees relative to
 export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
   const laptopRef = useRef<LaptopModelRef>(null);
   const rigRef = useRef<CameraRigRef>(null);
+  const completedRef = useRef(false);
+
+  const triggerComplete = useRef(onComplete);
+  triggerComplete.current = onComplete;
+
+  const triggerScreenFill = useRef(onScreenFill);
+  triggerScreenFill.current = onScreenFill;
 
   // Debug metrics state
   const [showDebug, setShowDebug] = useState(false);
@@ -29,6 +36,15 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
   });
 
   useEffect(() => {
+    // Safety fallback timer to ensure user is NEVER stuck (max 5.5s)
+    const fallbackTimer = setTimeout(() => {
+      if (!completedRef.current) {
+        completedRef.current = true;
+        if (triggerScreenFill.current) triggerScreenFill.current();
+        triggerComplete.current();
+      }
+    }, 5500);
+
     const timer = setTimeout(() => {
       if (!laptopRef.current || !rigRef.current) return;
 
@@ -52,8 +68,11 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
           }
         },
         onComplete: () => {
-          if (onScreenFill) onScreenFill();
-          setTimeout(onComplete, 300);
+          if (!completedRef.current) {
+            completedRef.current = true;
+            if (triggerScreenFill.current) triggerScreenFill.current();
+            setTimeout(() => triggerComplete.current(), 300);
+          }
         },
       });
 
@@ -63,7 +82,7 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
 
         tl.to(laptop.lidPivot.rotation, {
           x: OPEN_ANGLE,
-          duration: 2.2,
+          duration: 2.0,
           ease: "power3.inOut",
         });
       }
@@ -76,7 +95,7 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
           mat,
           {
             emissiveIntensity: 1.5,
-            duration: 0.8,
+            duration: 0.6,
             ease: "power1.in",
           },
           "-=0.6"
@@ -86,10 +105,10 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
           laptop.screenGlow,
           {
             intensity: 2.5,
-            duration: 0.8,
+            duration: 0.6,
             ease: "power1.in",
           },
-          "-=0.8"
+          "-=0.6"
         );
       }
 
@@ -102,10 +121,10 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
           x: 0.0,
           y: 1.2,
           z: 2.2,
-          duration: 1.8,
+          duration: 1.6,
           ease: "power2.inOut",
         },
-        "+=0.2"
+        "+=0.1"
       );
 
       tl.to(
@@ -114,7 +133,7 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
           x: screenPos.x,
           y: screenPos.y,
           z: screenPos.z,
-          duration: 1.8,
+          duration: 1.6,
           ease: "power2.inOut",
         },
         "<"
@@ -127,15 +146,18 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
           x: screenPos.x,
           y: screenPos.y,
           z: screenPos.z + 0.35, // Stop right in front of screen
-          duration: 1.2,
+          duration: 1.0,
           ease: "power3.in",
         },
-        "-=0.4"
+        "-=0.3"
       );
-    }, 300);
+    }, 200);
 
-    return () => clearTimeout(timer);
-  }, [onComplete, onScreenFill]);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(fallbackTimer);
+    };
+  }, []);
 
   return (
     <div className="fixed inset-0 z-40 bg-[#050607]">
