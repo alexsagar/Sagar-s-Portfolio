@@ -34,22 +34,22 @@ export const LaptopModel = forwardRef<LaptopModelRef, { lidAngle?: number }>(
 
     return (
       <group position={[0, -0.6, 0]}>
-        {/* Laptop Base Body */}
+        {/* White / Light Silver Laptop Base Body */}
         <mesh position={[0, 0, 0]}>
           <boxGeometry args={[5.2, 0.2, 3.6]} />
-          <meshStandardMaterial color="#121418" metalness={0.8} roughness={0.25} />
+          <meshStandardMaterial color="#F4F4F0" metalness={0.4} roughness={0.2} />
         </mesh>
 
-        {/* Keyboard Surface Recess */}
+        {/* Dark Keyboard Surface Recess */}
         <mesh position={[0, 0.11, -0.1]}>
           <boxGeometry args={[4.6, 0.02, 2.0]} />
-          <meshStandardMaterial color="#08090C" roughness={0.85} />
+          <meshStandardMaterial color="#1E293B" roughness={0.7} />
         </mesh>
 
-        {/* Trackpad Accent */}
+        {/* White Trackpad Accent */}
         <mesh position={[0, 0.11, 1.1]}>
           <boxGeometry args={[1.6, 0.02, 1.0]} />
-          <meshStandardMaterial color="#1B1E24" roughness={0.4} />
+          <meshStandardMaterial color="#E2E8F0" roughness={0.3} />
         </mesh>
 
         {/* Screen Glow Light reflected onto Keyboard */}
@@ -62,29 +62,28 @@ export const LaptopModel = forwardRef<LaptopModelRef, { lidAngle?: number }>(
         />
 
         {/* 
-          LID PIVOT HINGE (Positioned EXACTLY on physical back hinge at Z = -1.8)
-          When rotation.x = Math.PI / 2 (~1.57rad), lid stands upright (90°).
-          When rotation.x = 1.95rad (~112°), lid leans back naturally.
-          When rotation.x = 0.0rad (0°), lid is flat closed on top of keyboard.
+          WHITE LAPTOP HINGE PIVOT (Positioned at rear hinge: Z = -1.8)
+          When lidPivotRef.rotation.x = 0, lid lies flat forward along +Z over keyboard.
+          When lidPivotRef.rotation.x = -1.90 rads (~108°), lid opens UP along +Y and leans back.
         */}
-        <group ref={lidPivotRef} position={[0, 0.1, -1.8]} rotation={[0, 0, 0]}>
-          {/* Lid Mesh: Extends forward along +Z from hinge by half length 1.8 when closed */}
-          <group position={[0, 0.06, 1.8]}>
-            {/* Outer Lid Shell */}
+        <group ref={lidPivotRef} position={[0, 0.1, -1.8]}>
+          {/* Lid Group: Extends UP along +Y when open (position Y=1.6, Z=0) */}
+          <group position={[0, 1.6, 0]}>
+            {/* White Outer Lid Shell */}
             <mesh position={[0, 0, 0]}>
-              <boxGeometry args={[5.2, 0.1, 3.6]} />
-              <meshStandardMaterial color="#121418" metalness={0.85} roughness={0.2} />
+              <boxGeometry args={[5.2, 3.2, 0.12]} />
+              <meshStandardMaterial color="#F4F4F0" metalness={0.4} roughness={0.2} />
             </mesh>
 
-            {/* Display Bezel */}
-            <mesh position={[0, -0.055, 0]}>
-              <boxGeometry args={[5.0, 0.01, 3.4]} />
-              <meshStandardMaterial color="#050607" roughness={0.9} />
+            {/* Dark Display Bezel */}
+            <mesh position={[0, 0, 0.065]}>
+              <boxGeometry args={[5.0, 3.0, 0.01]} />
+              <meshStandardMaterial color="#0F172A" roughness={0.8} />
             </mesh>
 
-            {/* 3D Display Canvas Mesh */}
-            <mesh ref={screenMeshRef} position={[0, -0.065, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <planeGeometry args={[4.7, 3.1]} />
+            {/* Display Canvas Plane Facing Forward (+Z) */}
+            <mesh ref={screenMeshRef} position={[0, 0, 0.075]}>
+              <planeGeometry args={[4.7, 2.7]} />
               <meshStandardMaterial
                 color="#050607"
                 emissive="#67E8F9"
@@ -92,13 +91,12 @@ export const LaptopModel = forwardRef<LaptopModelRef, { lidAngle?: number }>(
                 roughness={0.1}
               />
 
-              {/* Drei Html Transform - Terminal UI inside 3D Display */}
+              {/* Drei Html Terminal UI inside 3D Screen */}
               <Html
                 transform
                 position={[0, 0, 0.01]}
-                rotation={[-Math.PI / 2, 0, 0]}
                 distanceFactor={2.4}
-                className="w-[780px] h-[480px] bg-[#050607] border border-[#1F2228] p-6 font-mono text-xs text-[#F4F4F0] selection:bg-[#67E8F9] selection:text-[#050607] pointer-events-none rounded shadow-2xl overflow-hidden flex flex-col justify-between"
+                className="w-[780px] h-[450px] bg-[#050607] border border-[#1F2228] p-6 font-mono text-xs text-[#F4F4F0] selection:bg-[#67E8F9] selection:text-[#050607] pointer-events-none rounded shadow-2xl overflow-hidden flex flex-col justify-between"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-[#1F2228] pb-3 text-[#8B9098]">

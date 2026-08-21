@@ -12,8 +12,11 @@ interface LaptopSceneProps {
   onScreenFill?: () => void;
 }
 
-const CLOSED_ANGLE = 0.0;
-const OPEN_ANGLE = 1.90; // Opens upward and leans back ~108 degrees relative to hinge
+// Lid rotation angles around hinge:
+// CLOSED_ANGLE: +1.52 rads (lid lies flat forward over keyboard)
+// OPEN_ANGLE: -0.15 rads (lid stands upright leaning back ~100 degrees)
+const CLOSED_ANGLE = 1.52;
+const OPEN_ANGLE = -0.15;
 
 export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
   const laptopRef = useRef<LaptopModelRef>(null);
@@ -36,7 +39,7 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
   });
 
   useEffect(() => {
-    // Safety fallback timer to ensure user is NEVER stuck (max 5.5s)
+    // Safety fallback timer (max 5.5s)
     const fallbackTimer = setTimeout(() => {
       if (!completedRef.current) {
         completedRef.current = true;
@@ -76,13 +79,13 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
         },
       });
 
-      // Step 1: Open Lid smoothly around hinge pivot (0.0 to 1.90 radians)
+      // Step 1: Open Lid smoothly around rear hinge (from flat CLOSED_ANGLE to OPEN_ANGLE)
       if (laptop.lidPivot) {
         laptop.lidPivot.rotation.x = CLOSED_ANGLE;
 
         tl.to(laptop.lidPivot.rotation, {
           x: OPEN_ANGLE,
-          duration: 2.0,
+          duration: 2.2,
           ease: "power3.inOut",
         });
       }
@@ -119,9 +122,9 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
         rig.position,
         {
           x: 0.0,
-          y: 1.2,
+          y: 1.1,
           z: 2.2,
-          duration: 1.6,
+          duration: 1.8,
           ease: "power2.inOut",
         },
         "+=0.1"
@@ -133,7 +136,7 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
           x: screenPos.x,
           y: screenPos.y,
           z: screenPos.z,
-          duration: 1.6,
+          duration: 1.8,
           ease: "power2.inOut",
         },
         "<"
@@ -145,7 +148,7 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
         {
           x: screenPos.x,
           y: screenPos.y,
-          z: screenPos.z + 0.35, // Stop right in front of screen
+          z: screenPos.z + 0.35,
           duration: 1.0,
           ease: "power3.in",
         },
@@ -157,7 +160,7 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
       clearTimeout(timer);
       clearTimeout(fallbackTimer);
     };
-  }, []);
+  }, [onComplete, onScreenFill]);
 
   return (
     <div className="fixed inset-0 z-40 bg-[#050607]">
@@ -168,9 +171,9 @@ export function LaptopScene({ onComplete, onScreenFill }: LaptopSceneProps) {
         className="w-full h-full"
       >
         <color attach="background" args={["#050607"]} />
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[4, 7, 4]} intensity={1.2} color="#F4F4F0" />
-        <pointLight position={[-3, 2, 2]} intensity={0.6} color="#67E8F9" />
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[4, 7, 4]} intensity={1.5} color="#FFFFFF" />
+        <pointLight position={[-3, 2, 2]} intensity={0.8} color="#67E8F9" />
 
         <LaptopModel ref={laptopRef} />
         <CameraRig ref={rigRef} />
