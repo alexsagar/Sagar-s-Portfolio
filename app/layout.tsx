@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 
 import "./globals.css";
 import { ThemeProvider } from "./provider";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Sagar Nepali | Digital Marketer & MERN Developer",
+  title: "Sagar Nepali | Full-Stack Developer & Software Engineer",
   description:
-    "Digital Marketer & MERN Stack Developer from Kathmandu, Nepal — building responsive web apps and impactful digital experiences.",
+    "Full-stack developer from Kathmandu, Nepal — building fast, scalable, and thoughtfully designed web applications.",
   keywords: [
     "Sagar Nepali",
-    "Digital Marketer Kathmandu",
-    "MERN Stack Developer Nepal",
-    "React Developer Nepal",
-    "Web Developer Kathmandu",
-    "SEO Specialist Nepal",
+    "Full-Stack Developer Nepal",
+    "React Developer Kathmandu",
+    "Next.js Developer Nepal",
+    "Software Engineer Nepal",
+    "PostgreSQL Node.js Developer",
   ],
   authors: [{ name: "Sagar Nepali" }],
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://sagar-nepali.com.np"),
@@ -26,23 +25,23 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "/",
-    title: "Sagar Nepali | Digital Marketer & MERN Developer",
+    title: "Sagar Nepali | Full-Stack Developer & Software Engineer",
     description:
-      "Digital Marketer & MERN Stack Developer from Kathmandu, Nepal — building responsive web apps and impactful digital experiences.",
+      "Full-stack developer from Kathmandu, Nepal — building fast, scalable, and thoughtfully designed web applications.",
     images: [
       {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Sagar Nepali Portfolio",
+        alt: "Sagar Nepali Workspace",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sagar Nepali | Digital Marketer & MERN Developer",
+    title: "Sagar Nepali | Full-Stack Developer & Software Engineer",
     description:
-      "Digital Marketer & MERN Stack Developer from Kathmandu, Nepal — building responsive web apps and impactful digital experiences.",
+      "Full-stack developer from Kathmandu, Nepal — building fast, scalable, and thoughtfully designed web applications.",
     images: ["/og.png"],
   },
 };
@@ -53,82 +52,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="icon" href="/profilepic.svg" sizes="any" />
-        <link rel="manifest" href="/site.webmanifest" />
-        <meta name="theme-color" content="#0b1024" />
-        {/** Preconnects removed to avoid unused-preconnect warnings; Next/font handles fonts. */}
-        {process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? (
-          <meta
-            name="google-site-verification"
-            content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION}
-          />
-        ) : null}
-        <script
-          type="application/ld+json"
-          // Note: replace siteUrl in env for production
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Person",
-              name: "Sagar Nepali",
-              url: process.env.NEXT_PUBLIC_SITE_URL || "https://sagar-nepali.com.np",
-              jobTitle: "Digital Marketer & MERN Stack Developer",
-              sameAs: [
-                "https://github.com/alexsagar",
-                "https://www.linkedin.com/in/sagar-nepali-293751217/",
-                "https://www.instagram.com/unsagarized/",
-              ],
-              worksFor: {
-                "@type": "Organization",
-                name: "Self-Employed",
-              },
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Kathmandu",
-                addressCountry: "NP",
-              },
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify([
-              {
-                "@context": "https://schema.org",
-                "@type": "WebSite",
-                name: "Sagar Nepali Portfolio",
-                url: process.env.NEXT_PUBLIC_SITE_URL || "https://sagar-nepali.com.np",
-              },
-              {
-                "@context": "https://schema.org",
-                "@type": "ProfilePage",
-                mainEntity: {
-                  "@type": "Person",
-                  name: "Sagar Nepali",
-                  jobTitle: "Digital Marketer & MERN Stack Developer",
-                  url: process.env.NEXT_PUBLIC_SITE_URL || "https://sagar-nepali.com.np",
-                  image: `${process.env.NEXT_PUBLIC_SITE_URL || "https://sagar-nepali.com.np"}/profilepic.svg`,
-                }
-              },
-              {
-                "@context": "https://schema.org",
-                "@type": "ItemList",
-                itemListElement: [
-                  { "@type": "ListItem", position: 1, name: "CinemaGhar" },
-                  { "@type": "ListItem", position: 2, name: "GamePasal" },
-                  { "@type": "ListItem", position: 3, name: "Tea-N-Tea Management System" },
-                  { "@type": "ListItem", position: 4, name: "Full Stack Voting App" },
-                  { "@type": "ListItem", position: 5, name: "Nike Ecommerce Website" }
-                ]
-              }
-            ]),
-          }}
-        />
-      </head>
-      <body className={inter.className}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} dark`} suppressHydrationWarning>
+      <body className="min-h-screen bg-[#070809] text-[#F4F4F0] antialiased selection:bg-[#67E8F9] selection:text-[#070809]">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

@@ -1,29 +1,29 @@
-import { navItems } from "@/data";
+import React from "react";
+import { Header } from "@/components/navigation/Header";
+import { Hero } from "@/components/home/Hero";
+import { FeaturedProjects } from "@/components/home/FeaturedProjects";
+import { LiveGitHubSection } from "@/components/home/LiveGitHubSection";
+import { TechStackSection } from "@/components/home/TechStackSection";
+import { ExperienceSection } from "@/components/home/ExperienceSection";
+import { Footer } from "@/components/footer/Footer";
+import { fetchGitHubOverview } from "@/lib/github/repositories";
 
-import Hero from "@/components/Hero";
-import Grid from "@/components/Grid";
-import Footer from "@/components/Footer";
-import Clients from "@/components/Clients";
-import Approach from "@/components/Approach";
-import Experience from "@/components/Experience";
-import RecentProjects from "@/components/RecentProjects";
-import { FloatingNav } from "@/components/ui/FloatingNavbar";
+export const revalidate = 3600; // Revalidate page every hour
 
-const Home = () => {
+export default async function HomePage() {
+  const activity = await fetchGitHubOverview();
+
   return (
-    <main className="relative bg-black-100 flex justify-center items-center flex-col overflow-hidden mx-auto sm:px-10 px-5">
-      <div className="max-w-7xl w-full">
-        <FloatingNav navItems={navItems} />
-        <Hero />
-        <Grid />
-        <RecentProjects />
-        <Clients />
-        <Experience />
-        <Approach />
-        <Footer />
-      </div>
-    </main>
+    <div className="min-h-screen bg-[#070809] text-[#F4F4F0] selection:bg-[#67E8F9]/20 selection:text-[#67E8F9]">
+      <Header />
+      <main>
+        <Hero activity={activity} />
+        <FeaturedProjects repositories={activity.featuredRepos} />
+        <LiveGitHubSection activity={activity} />
+        <TechStackSection />
+        <ExperienceSection />
+      </main>
+      <Footer />
+    </div>
   );
-};
-
-export default Home;
+}
