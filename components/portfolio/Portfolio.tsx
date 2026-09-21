@@ -231,77 +231,39 @@ function ClosingScene() {
 }
 
 const defaultClientPartners = [
-  { id: "hypead", content: <span>Hype<span className="partner-ad">AD</span></span> },
-  { id: "mindrisers", content: <span className="partner-mind">mindrisers<span>Learn. Build. Grow.</span></span> },
-  { id: "duo", content: <span className="partner-duo">DUO<span>NEPAL</span></span> },
-  { id: "babylon", content: <span className="partner-babylon">Babylon<span>National School</span></span> },
-  { id: "streamstop", content: <span className="partner-stream">streamstop<span>↗</span></span> },
   {
     id: "dai",
     content: (
-      <div className="partner-stacked-item">
-        <Image
-          src="/clients/da-investment-clean.png"
-          alt="DAI"
-          width={84}
-          height={38}
-          loading="lazy"
-          className="partner-emblem-top"
-        />
-        <span className="partner-stacked-title">DA Investment</span>
-        <span className="partner-stacked-sub">PVT. LTD.</span>
-      </div>
+      <Image src="/clients/da-investment-clean.png" alt="DA Investment"
+        width={160} height={72} loading="lazy" className="partner-logo-only" />
     ),
   },
   {
     id: "dd",
     content: (
-      <div className="partner-stacked-item">
-        <Image
-          src="/clients/dd-security-clean.png"
-          alt="DD Security"
-          width={44}
-          height={44}
-          loading="lazy"
-          className="partner-emblem-top"
-        />
-        <span className="partner-stacked-title">DD Security</span>
-        <span className="partner-stacked-sub">SERVICE</span>
-      </div>
+      <Image src="/clients/dd-security-clean.png" alt="DD Security"
+        width={80} height={80} loading="lazy" className="partner-logo-only" />
     ),
   },
   {
     id: "seven",
     content: (
-      <div className="partner-stacked-item">
-        <Image
-          src="/clients/seven-seas-clean.png"
-          alt="Seven Seas"
-          width={40}
-          height={42}
-          loading="lazy"
-          className="partner-emblem-top"
-        />
-        <span className="partner-stacked-title">Seven Seas</span>
-        <span className="partner-stacked-sub">INTERCONTINENTAL</span>
-      </div>
+      <Image src="/clients/seven-seas-clean.png" alt="Seven Seas Intercontinental"
+        width={80} height={80} loading="lazy" className="partner-logo-only" />
     ),
   },
   {
     id: "itti",
     content: (
-      <span className="partner-itti">
-        <Image
-          src="/clients/itti-dark.svg"
-          alt="ITTI"
-          width={118}
-          height={48}
-          loading="lazy"
-          className="partner-logo-img"
-        />
-      </span>
+      <Image src="/clients/itti-dark.svg" alt="ITTI"
+        width={160} height={64} loading="lazy" unoptimized className="partner-logo-only" />
     ),
   },
+  { id: "hypead", content: <span className="partner-logo-text">Hype<span className="partner-ad">AD</span></span> },
+  { id: "mindrisers", content: <span className="partner-logo-text partner-mind">mindrisers</span> },
+  { id: "duo", content: <span className="partner-logo-text partner-duo">DUO<span>NEPAL</span></span> },
+  { id: "babylon", content: <span className="partner-logo-text partner-babylon">Babylon</span> },
+  { id: "streamstop", content: <span className="partner-logo-text">streamstop</span> },
 ];
 
 function cleanBrandTitle(name: string, subtitle?: string): string {
@@ -336,47 +298,24 @@ export default function Portfolio({
   const activeClients = (sanityClients && sanityClients.length > 0)
     ? sanityClients.map(c => {
         const imgSrc = c.logo ? resolveImageUrl(c.logo) : "";
-        const isSvg = imgSrc.includes(".svg");
-        const cleanTitle = cleanBrandTitle(c.name, c.subtitle);
-        const isPureLogo = cleanTitle.toUpperCase() === "ITTI" || (!c.subtitle && imgSrc && cleanTitle.length <= 4);
-
-        if (isPureLogo && imgSrc) {
-          return {
-            id: c._id || c.id || c.name,
-            content: (
-              <span className="partner-itti">
-                <Image
-                  src={imgSrc}
-                  alt={c.name}
-                  width={118}
-                  height={48}
-                  unoptimized={isSvg}
-                  loading="lazy"
-                  className="partner-logo-img"
-                />
-              </span>
-            ),
-          };
-        }
+        const isSvg = imgSrc.endsWith(".svg");
+        // Detect wide logos (landscape aspect) vs square/tall logos
+        const isWide = c.logo?.asset?.url?.includes('-264x') || c.logo?.asset?.url?.includes('-447x') || false;
 
         return {
           id: c._id || c.id || c.name,
-          content: (
-            <div className="partner-stacked-item">
-              {imgSrc ? (
-                <Image
-                  src={imgSrc}
-                  alt={c.name}
-                  width={84}
-                  height={42}
-                  unoptimized={isSvg}
-                  loading="lazy"
-                  className="partner-emblem-top"
-                />
-              ) : null}
-              <span className="partner-stacked-title">{cleanTitle}</span>
-              {c.subtitle && <span className="partner-stacked-sub">{c.subtitle}</span>}
-            </div>
+          content: imgSrc ? (
+            <Image
+              src={imgSrc}
+              alt={c.name}
+              width={isWide ? 160 : 80}
+              height={isWide ? 72 : 80}
+              unoptimized={isSvg}
+              loading="lazy"
+              className="partner-logo-only"
+            />
+          ) : (
+            <span className="partner-logo-text">{c.name}</span>
           ),
         };
       })
