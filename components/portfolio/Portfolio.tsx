@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Plus } from "lucide-react";
 import { SiAdobephotoshop, SiAdobeaftereffects, SiSemrush, SiGoogleads } from "react-icons/si";
 import { testimonials as defaultTestimonials, workExperience } from "@/data";
@@ -37,45 +37,94 @@ function Testimonials({ items }: { items?: TestimonialItem[] }) {
     ? items
     : [defaultTestimonials[0], defaultTestimonials[2]];
   const [active, setActive] = useState(0);
-  const quote = clientQuotes[active % clientQuotes.length];
-  const move = (direction: number) =>
-    setActive(current => (current + direction + clientQuotes.length) % clientQuotes.length);
+  const [direction, setDirection] = useState(1);
+  const [paused, setPaused] = useState(false);
+  const reduced = useReducedMotion();
+
+  const move = useCallback((dir: number) => {
+    setDirection(dir);
+    setActive(current => (current + dir + clientQuotes.length) % clientQuotes.length);
+  }, [clientQuotes.length]);
+
+  // Auto-advance every 5 seconds, pause on hover / drag
+  useEffect(() => {
+    if (paused || reduced) return;
+    const id = setInterval(() => move(1), 5000);
+    return () => clearInterval(id);
+  }, [paused, reduced, move]);
+
+  const quote = clientQuotes[active];
+
+  const variants = {
+    enter: (d: number) => ({ x: d > 0 ? 60 : -60, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (d: number) => ({ x: d > 0 ? -60 : 60, opacity: 0 }),
+  };
 
   return (
     <AnimatedSection className="testimonial-section wrap" aria-label="Client testimonials">
       <div className="testimonial-top">
         <span className="section-label">Kind words</span>
-        <span>From the people I’ve worked with</span>
+        <span>From the people I've worked with</span>
       </div>
       <motion.div
         className="testimonial-body"
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.12}
+        onDragStart={() => setPaused(true)}
         onDragEnd={(_, info) => {
           if (Math.abs(info.offset.x) > 50) move(info.offset.x < 0 ? 1 : -1);
+          setTimeout(() => setPaused(false), 800);
         }}
+        onHoverStart={() => setPaused(true)}
+        onHoverEnd={() => setPaused(false)}
       >
-        <span className="quote-mark" aria-hidden="true">“</span>
-        <div aria-live="polite" aria-atomic="true">
-          <blockquote>{quote.quote}</blockquote>
-          <p className="quote-person">
-            {quote.name}
-            <span>{quote.title}</span>
-          </p>
+        <span className="quote-mark" aria-hidden="true">"</span>
+        <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', overflow: 'hidden', minHeight: '260px' }}>
+          <AnimatePresence custom={direction} mode="wait">
+            <motion.div
+              key={active}
+              custom={direction}
+              variants={reduced ? undefined : variants}
+              initial={reduced ? false : "enter"}
+              animate="center"
+              exit={reduced ? undefined : "exit"}
+              transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
+            >
+              <blockquote>{quote.quote}</blockquote>
+              <p className="quote-person">
+                {quote.name}
+                <span>{quote.title}</span>
+              </p>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </motion.div>
       <div className="quote-controls">
         <span>
           {String(active + 1).padStart(2, "0")} / {String(clientQuotes.length).padStart(2, "0")}
         </span>
-        <div>
-          <button onClick={() => move(-1)} aria-label="Previous testimonial">
-            <ArrowLeft />
-          </button>
-          <button onClick={() => move(1)} aria-label="Next testimonial">
-            <ArrowRight />
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Progress dots */}
+          <div className="testimonial-dots">
+            {clientQuotes.map((_, i) => (
+              <button
+                key={i}
+                className={`testimonial-dot${i === active ? ' is-active' : ''}`}
+                onClick={() => { setDirection(i > active ? 1 : -1); setActive(i); setPaused(true); setTimeout(() => setPaused(false), 6000); }}
+                aria-label={`Go to testimonial ${i + 1}`}
+              />
+            ))}
+          </div>
+          <div>
+            <button onClick={() => { move(-1); setPaused(true); setTimeout(() => setPaused(false), 6000); }} aria-label="Previous testimonial">
+              <ArrowLeft />
+            </button>
+            <button onClick={() => { move(1); setPaused(true); setTimeout(() => setPaused(false), 6000); }} aria-label="Next testimonial">
+              <ArrowRight />
+            </button>
+          </div>
         </div>
       </div>
     </AnimatedSection>

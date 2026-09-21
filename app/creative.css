@@ -249,6 +249,10 @@ h1, h2, h3, h4, h5, .wordmark, .pill, .service-row summary, .mold-text, .section
 .quote-controls > div { display: flex; gap: 12px; }
 .quote-controls button { border: 1px solid #5f546d; border-radius: 50%; width: 54px; height: 54px; display: grid; place-items: center; color: white; }
 .quote-controls button:hover { background: var(--violet); }
+/* Testimonial auto-scroll progress dots */
+.testimonial-dots { display: flex; align-items: center; gap: 8px; }
+.testimonial-dot { width: 8px; height: 8px; border-radius: 50%; background: #5f546d; border: none; padding: 0; cursor: pointer; transition: background 0.3s, transform 0.3s, width 0.3s; }
+.testimonial-dot.is-active { background: var(--lavender); width: 24px; border-radius: 4px; transform: none; }
 .toolbox-section { padding: 150px 0 180px; }
 .toolbox-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; max-width: 850px; margin: 75px auto 0; }
 .tool-item { width: 170px; text-align: center; color: #b5afc1; }
