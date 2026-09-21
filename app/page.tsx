@@ -1,11 +1,23 @@
-import React from "react";
-import { IntroExperience } from "@/components/intro/IntroExperience";
+import Portfolio from "@/components/portfolio/Portfolio";
+import { sanityFetch } from "@/sanity/lib/client";
+import { clientsQuery, featuredPostsQuery, projectsQuery, testimonialsQuery } from "@/sanity/lib/queries";
 
-export const metadata = {
-  title: "Sagar Nepali | Workspace & Developer Terminal",
-  description: "Interactive workspace portfolio and developer terminal of Sagar Nepali.",
-};
+export const revalidate = 60;
 
-export default function HomePage() {
-  return <IntroExperience />;
+export default async function HomePage() {
+  const [sanityProjects, sanityClients, sanityTestimonials, sanityPosts] = await Promise.all([
+    sanityFetch<any[]>({ query: projectsQuery, tags: ["project"] }),
+    sanityFetch<any[]>({ query: clientsQuery, tags: ["client"] }),
+    sanityFetch<any[]>({ query: testimonialsQuery, tags: ["testimonial"] }),
+    sanityFetch<any[]>({ query: featuredPostsQuery, tags: ["post"] }),
+  ]);
+
+  return (
+    <Portfolio
+      sanityProjects={sanityProjects || undefined}
+      sanityClients={sanityClients || undefined}
+      sanityTestimonials={sanityTestimonials || undefined}
+      sanityPosts={sanityPosts || undefined}
+    />
+  );
 }

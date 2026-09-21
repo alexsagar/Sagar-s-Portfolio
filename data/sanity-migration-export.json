@@ -1,0 +1,145 @@
+{
+  "projects": [
+    {
+      "title": "CinemaGhar",
+      "slug": "cinemaghar",
+      "description": "Movie discovery and details app with a clean, responsive UI.",
+      "category": "Website design & development",
+      "imagePath": "public/projects/cinemaghar.webp",
+      "link": "https://github.com/alexsagar/CinemaGhar",
+      "tags": [
+        "React",
+        "Tailwind CSS",
+        "TypeScript"
+      ],
+      "order": 1
+    },
+    {
+      "title": "GamePasal",
+      "slug": "gamepasal",
+      "description": "Gaming storefront demo with product listings and modern UI.",
+      "category": "Website design & development",
+      "imagePath": "public/projects/gamepasal.webp",
+      "link": "https://github.com/alexsagar/GamePasal",
+      "tags": [
+        "React",
+        "Tailwind CSS",
+        "TypeScript"
+      ],
+      "order": 2
+    },
+    {
+      "title": "Tea-N-Tea Management System",
+      "slug": "tea-n-tea-management-system",
+      "description": "Management dashboard for operations and record keeping.",
+      "category": "Website design & development",
+      "imagePath": "public/projects/teantea.webp",
+      "link": "https://github.com/alexsagar/Tea-N-Tea-Management-System",
+      "tags": [
+        "React",
+        "Tailwind CSS",
+        "TypeScript"
+      ],
+      "order": 3
+    },
+    {
+      "title": "Full Stack Voting App",
+      "slug": "full-stack-voting-app",
+      "description": "End-to-end voting application with secure flows.",
+      "category": "Website design & development",
+      "imagePath": "public/projects/votingapp.webp",
+      "link": "https://github.com/alexsagar/fullstack-voting-app",
+      "tags": [
+        "React",
+        "Tailwind CSS",
+        "TypeScript"
+      ],
+      "order": 4
+    },
+    {
+      "title": "Nike Ecommerce Website",
+      "slug": "nike-ecommerce-website",
+      "description": "Ecommerce UI inspired by Nike—product cards and smooth layout.",
+      "category": "Website design & development",
+      "imagePath": "public/projects/nike.webp",
+      "link": "https://github.com/alexsagar/Nike-Ecommerce-Website",
+      "tags": [
+        "React",
+        "Tailwind CSS",
+        "TypeScript"
+      ],
+      "order": 5
+    }
+  ],
+  "clients": [
+    {
+      "name": "DA Investment Pvt. Ltd.",
+      "subtitle": "Pvt. Ltd.",
+      "logoPath": "public/clients/da-investment-clean.png",
+      "order": 1
+    },
+    {
+      "name": "DD Security Service",
+      "subtitle": "Service",
+      "logoPath": "public/clients/dd-security-clean.png",
+      "order": 2
+    },
+    {
+      "name": "Seven Seas Intercontinental",
+      "subtitle": "Intercontinental",
+      "logoPath": "public/clients/seven-seas-clean.png",
+      "order": 3
+    },
+    {
+      "name": "ITTI",
+      "subtitle": "",
+      "logoPath": "public/clients/itti-dark.svg",
+      "order": 4
+    },
+    {
+      "name": "HypeAD",
+      "subtitle": "Marketing Agency",
+      "order": 5
+    },
+    {
+      "name": "Mindrisers",
+      "subtitle": "Learn. Build. Grow.",
+      "order": 6
+    },
+    {
+      "name": "DUO Nepal",
+      "subtitle": "",
+      "order": 7
+    },
+    {
+      "name": "Babylon National School",
+      "subtitle": "",
+      "order": 8
+    },
+    {
+      "name": "Streamstop",
+      "subtitle": "",
+      "order": 9
+    }
+  ],
+  "testimonials": [
+    {
+      "name": "Saugat Ojha",
+      "title": "HypeAD Marketing Agency",
+      "quote": "Working with Sagar was a great experience from start to finish. He quickly understood our requirements and translated them into clean, scalable features with thoughtful UX. Communication was consistent and proactive, and he handled feedback with a professional, solutions‑oriented mindset. The final deliverables were stable, performant, and easy for our team to maintain.",
+      "order": 1
+    },
+    {
+      "name": "Mindrisers Institute",
+      "title": "Training & Collaboration Partner",
+      "quote": "Sagar demonstrated strong problem‑solving skills and genuine ownership over his work. He iterated quickly, improved UI/UX details without being asked, and backed decisions with clear reasoning. His collaborative approach and attention to edge cases significantly improved our timelines and overall quality of the product experience.",
+      "order": 2
+    },
+    {
+      "name": "Bipasana Karki",
+      "title": "Duo Nepal",
+      "quote": "Professional, reliable, and creative—Sagar elevated our digital presence beyond expectations. He produced high‑quality visuals and copy, aligned them with brand goals, and ensured smooth hand‑off and implementation. We appreciated his calm under pressure, clear documentation, and commitment to delivering measurable results.",
+      "order": 3
+    }
+  ]
+}
