@@ -17,7 +17,7 @@ export default function Studio() {
         width: '100vw',
       }}
     >
-      <NextStudio config={config} />
+      <NextStudio config={{ ...config, basePath: '/studio' }} />
     </div>
   );
 }

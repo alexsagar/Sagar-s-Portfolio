@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "deploy": "vercel --prod",
-    "migrate:sanity": "node scripts/migrate-to-sanity.mjs"
+    "migrate:sanity": "node scripts/migrate-to-sanity.mjs",
+    "sanity": "sanity"
   },
   "dependencies": {
     "@sanity/image-url": "^1.2.0",
