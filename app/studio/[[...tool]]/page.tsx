@@ -1,23 +1,11 @@
-'use client';
+import Studio from './Studio';
 
-import { NextStudio } from 'next-sanity/studio';
-import config from '../../../sanity.config';
+export const dynamic = 'force-static';
+
+export function generateStaticParams() {
+  return [{ tool: [] }];
+}
 
 export default function StudioPage() {
-  return (
-    <div
-      data-lenis-prevent
-      data-lenis-prevent-wheel
-      data-lenis-prevent-touch
-      style={{
-        position: 'fixed',
-        inset: 0,
-        height: '100vh',
-        maxHeight: '100dvh',
-        width: '100vw',
-      }}
-    >
-      <NextStudio config={config} />
-    </div>
-  );
+  return <Studio />;
 }
