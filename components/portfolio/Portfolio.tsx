@@ -65,7 +65,7 @@ function Testimonials({ items }: { items?: TestimonialItem[] }) {
     <AnimatedSection className="testimonial-section wrap" aria-label="Client testimonials">
       <div className="testimonial-top">
         <span className="section-label">Kind words</span>
-        <span>From the people I've worked with</span>
+        <span>From the people I&apos;ve worked with</span>
       </div>
       <motion.div
         className="testimonial-body"
@@ -80,7 +80,7 @@ function Testimonials({ items }: { items?: TestimonialItem[] }) {
         onHoverStart={() => setPaused(true)}
         onHoverEnd={() => setPaused(false)}
       >
-        <span className="quote-mark" aria-hidden="true">"</span>
+        <span className="quote-mark" aria-hidden="true">{'\u201c'}</span>
         <div aria-live="polite" aria-atomic="true" style={{ position: 'relative', overflow: 'hidden', minHeight: '260px' }}>
           <AnimatePresence custom={direction} mode="wait">
             <motion.div
