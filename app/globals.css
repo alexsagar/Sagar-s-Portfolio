@@ -71,7 +71,7 @@
     scroll-padding-top: 7rem;
   }
   * {
-    @apply border-border !scroll-smooth;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;

@@ -4,9 +4,9 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0b1024",
-  "theme_color": "#0b1024",
-  "description": "Digital Marketer & MERN Stack Developer from Kathmandu, Nepal — building responsive web apps and impactful digital experiences.",
+  "background_color": "#141414",
+  "theme_color": "#141414",
+  "description": "Website design, photo editing, video editing, digital marketing, and SEO by Sagar Nepali in Kathmandu, Nepal.",
   "icons": [
     {
       "src": "/profilepic.svg",
