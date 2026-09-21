@@ -1,4 +1,4 @@
-import { groq } from 'next-sanity';
+import groq from 'groq';
 
 export const clientsQuery = groq`
   *[_type == "client"] | order(order asc, _createdAt asc) {

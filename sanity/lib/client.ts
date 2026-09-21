@@ -1,4 +1,4 @@
-import { createClient, type QueryParams } from 'next-sanity';
+import { createClient, type QueryParams } from '@sanity/client';
 import { apiVersion, dataset, projectId, useCdn, token } from '../env';
 
 export const isSanityConfigured = Boolean(projectId);
